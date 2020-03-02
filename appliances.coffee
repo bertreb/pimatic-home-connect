@@ -92,14 +92,6 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.OperationState"
-        },
-        {
-          name: "RemoteControlStartAllowed"
-          type: "string"
-          description: ""
-          unit: ""
-          default: ""
-          key: "BSH.Common.Status.RemoteControlStartAllowed"
         }
       ]
       

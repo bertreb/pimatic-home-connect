@@ -312,23 +312,35 @@ module.exports = (env) ->
         reject()
       )
 
-      executableCommand = false
+      executableCommand = true
 
       switch command
+        when "start"
+          if (@attributeValues.OperationState).indexOf("Ready") >= 0
+            body = 
+              data:
+                key: "BSH.Common.Command.StartProgram"
+                value: true          
+        when "stop"
+            body = 
+              data:
+                key: "BSH.Common.Command.StopProgram"
+                value: true
         when "pause"
           if (@attributeValues.OperationState).indexOf("Run") >= 0
-            executableCommand = true
             body = 
               data:
                 key: "BSH.Common.Command.PauseProgram"
                 value: true          
         when "resume"
           if (@attributeValues.OperationState).indexOf("Pause") >= 0
-            executableCommand = true
             body = 
               data:
                 key: "BSH.Common.Command.ResumeProgram"
                 value: true
+        else
+          executableCommand = false
+
 
       return new Promise((resolve, reject) =>
         if executableCommand
@@ -339,7 +351,7 @@ module.exports = (env) ->
             resolve()            
           )
           .catch((err) =>
-            @errorHandler(err)
+            @error.errorHandler(err)
             reject(err)
           )
         else
