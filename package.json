@@ -13,6 +13,7 @@
     "device-config-schema.coffee",
     "appliances",
     "error",
+    "main.js",
     "README.md",
     "LICENSE",
     "HISTORY.md"
