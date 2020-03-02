@@ -1,0 +1,43 @@
+{
+  "name": "pimatic-home-connect",
+  "description": "Pimatic plugin to connect home-connect to Pimatic",
+  "author": {
+    "name": "Bert Gierveld",
+    "email": "gitbertreb@gmail.com",
+    "url": "https://github.com/bertreb"
+  },
+  "main": "pimatic-home-connect",
+  "files": [
+    "pimatic-home-connect.coffee",
+    "pimatic-home-connect-config-schema.coffee",
+    "device-config-schema.coffee",
+    "devices/oven.coffee",
+    "devices/coffeemaker.coffee",
+    "README.md",
+    "LICENSE",
+    "HISTORY.md"
+  ],
+  "homepage": "https://github.com/bertreb/pimatic-home-connect.git",
+  "keywords": [
+    "pimatic",
+    "home-connect"
+  ],
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bertreb/pimatic-home-connect.git"
+  },
+  "configSchema": "pimatic-home-connect-config-schema.coffee",
+  "dependencies": {
+    "home-connect-js": ">=0.1.3",
+    "lodash": "^4.17.15",
+    "node-machine-id": "^1.1.12"
+  },
+  "peerDependencies": {
+    "pimatic": "0.9.*"
+  },
+  "engines": {
+    "node": ">=4",
+    "npm": ">=2"
+  }
+}
