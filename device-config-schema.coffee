@@ -20,7 +20,6 @@ module.exports = {
       vib:
         description: "The Vertriebs Identifikations Bezeichner of the appliance"
         type: "string"
-
     }
   }
 }

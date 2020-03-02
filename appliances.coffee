@@ -1,6 +1,5 @@
 module.exports = (env) ->
 
-
   @supportedTypes = ["CoffeeMaker","Oven"]
 
   class CoffeeMaker
@@ -99,7 +98,7 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.RemoteControlStartAllowed"
-        }      
+        }
       ]
 
   class Oven
@@ -198,11 +197,10 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.RemoteControlStartAllowed"
-        }      
+        }
       ]
 
   return exports = {
     CoffeeMaker
     Oven
   }
-
