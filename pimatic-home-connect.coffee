@@ -6,12 +6,15 @@ module.exports = (env) ->
   HomeConnect = require('home-connect-js')
   CoffeeMaker = require('./devices/coffeemaker')(env)
   Oven = require('./devices/oven')(env)
+  Error = require('./devices/error.coffee')(env)
 
   class HomeconnectPlugin extends env.plugins.Plugin
     init: (app, @framework, @config) =>
 
       pluginConfigDef = require './pimatic-home-connect-config-schema'
       @deviceConfigDef = require("./device-config-schema")
+
+      @errorHandler = new Error()
 
       @clientId = @config.clientId 
       @clientSecret = @config.clientSecret #"a1b2c3d4";
@@ -99,34 +102,13 @@ module.exports = (env) ->
           _cl = null
       return _cl
 
-    errorHandler: (error) =>
-      switch(error)
-        when "200"
-          env.logger.error "ErrorHandler: active program"
-        when "401"
-          env.logger.error "ErrorHandler: Unauthorized"
-        when "403"
-          env.logger.error "ErrorHandler: Forbidden"
-        when "404"
-          env.logger.error "ErrorHandler: NoProgramActive"
-        when "406"
-          env.logger.error "ErrorHandler: NotAcceptable"
-        when "409"
-          env.logger.error "ErrorHandler: HomeApplianceError"
-        when "429"
-          env.logger.error "ErrorHandler: QuotaError"
-        when "500"
-          env.logger.error "ErrorHandler: InternalError"
-        else
-          env.logger.error "ErrorHandler: Unknown error #{error}"
-
-
 
   class HomeconnectDevice extends env.devices.Device
 
     constructor: (config, lastState, @plugin, @framework) ->
       @config = config
       @id = @config.id
+      @errorHandler = @plugin.errorHandler
 
       @name = @config.name
       @haid = @config.haid
@@ -337,33 +319,33 @@ module.exports = (env) ->
 
   
     execute: (device, command) =>
-      env.logger.info "@attributes.OperationState '#{@attributeValues.OperationState}', command #{command}"
+      env.logger.debug "@attributes.OperationState '#{@attributeValues.OperationState}', command #{command}"
       env.logger.info "Execution not implemented"
-      return
-      body = 
-        data:
-          key: "BSH.Common.EnumType.OperationState"
-          value: "BSH.Common.EnumType.OperationState.Run"
-          ###
-          key: "ConsumerProducts.CoffeeMaker.Program.Beverage.Cappuccino"       
-          options: [
-            {
-              key: "ConsumerProducts.CoffeeMaker.Option.CoffeeTemperature"
-              value: "ConsumerProducts.CoffeeMaker.EnumType.CoffeeTemperature.95C"
-            },
-            {
-              key: "ConsumerProducts.CoffeeMaker.EnumType.BeanAmount"
-              value: "ConsumerProducts.CoffeeMaker.EnumType.BeanAmount.DoubleShotPlusPlus"
-            },
-            {
-              key: "ConsumerProducts.CoffeeMaker.Option.FillQuantity"
-              value: 200
-            }
-          ]
-          ###
+      
+      return new Promise((resolve, reject) =>
+        reject()
+      )
+
+      executableCommand = false
+
+      switch command
+        when "pause"
+          if (@attributeValues.OperationState).indexOf("Run") >= 0
+            executableCommand = true
+            body = 
+              data:
+                key: "BSH.Common.Command.PauseProgram"
+                value: true          
+        when "resume"
+          if (@attributeValues.OperationState).indexOf("Pause") >= 0
+            executableCommand = true
+            body = 
+              data:
+                key: "BSH.Common.Command.ResumeProgram"
+                value: true
 
       return new Promise((resolve, reject) =>
-        if (@attributeValues.OperationState).indexOf("Ready") >= 0
+        if executableCommand
           @homeconnect.command('programs', 'start_program', @haid, body)
           .then((res)=>
             #env.logger.info "Device #{device.name}: program '#{command}' started"
@@ -378,46 +360,8 @@ module.exports = (env) ->
           #env.logger.info "Device #{device.name}: program '#{command}' not started"
           env.logger.info "Program '#{command}' not started"
           reject()
-
       )
 
-
-    errorHandler: (error) =>
-      switch(error)
-        when "Unauthorized"
-          env.logger.error "ErrorHandler: Unauthorized - No or invalid access token"
-        when "Forbidden"
-          env.logger.error "ErrorHandler: Forbidden - Scope has not been granted"
-        when "NotFound"
-          env.logger.error "ErrorHandler: The requested resource was not found"
-        when "NoProgramSelected"
-          env.logger.error "ErrorHandler: No program is currently selected"
-        when "NoProgramActive"
-          env.logger.error "ErrorHandler: No program is currently active"
-        when "NotAcceptable"
-          env.logger.error "ErrorHandler: The resource identified by the request is only capable of generating response entities which have content characteristics not acceptable according to the accept headers sent in the request."
-        when "RequestTimeout"
-          env.logger.error "ErrorHandler: API Server failed to produce an answer or has no connection to backend service"
-        when "HomeApplianceError"
-          env.logger.error "ErrorHandler: An error occured during communication with the home appliance or the home appliance itself answered with an error, e.g. because the issued command was unacceptable in the current state."
-        when "SelectedProgramNotSet"
-          env.logger.error "ErrorHandler: No program is currently selected"
-        when "ActiveProgramNotSet"
-          env.logger.error "ErrorHandler: No program is currently active"
-        when "WrongOperationState"
-          env.logger.error "ErrorHandler: Request cannot be performed since the OperationState is wrong"
-        when "ProgramNotAvailable"
-          env.logger.error "ErrorHandler: The requested program is not available"
-        when "ContentTypeError"
-          env.logger.error "ErrorHandler: The request's Content-Type is not supported."
-        when "QuotaError"
-          env.logger.error "ErrorHandler: The number of requests for a specific endpoint exceeded the quota of the client."
-        when "InternalError"
-          env.logger.error "ErrorHandler: Internal Server Error"
-        when "Conflict"
-          env.logger.error "ErrorHandler: Command/Query cannot be executed for the home appliance, the error response contains the error details"
-        else
-          env.logger.error "ErrorHandler: Unknown error #{error}"
 
     destroy:() =>
       clearTimeout(@checkConnectedTimer)

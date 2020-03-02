@@ -13,6 +13,7 @@
     "device-config-schema.coffee",
     "devices/oven.coffee",
     "devices/coffeemaker.coffee",
+    "devices/error.coffee",
     "README.md",
     "LICENSE",
     "HISTORY.md"
