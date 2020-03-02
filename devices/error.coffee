@@ -1,8 +1,4 @@
 module.exports = (env) ->
-  Promise = env.require 'bluebird'
-  assert = env.require 'cassert'
-  events = require 'events'
-  _ = require 'lodash'
 
   class Error
 

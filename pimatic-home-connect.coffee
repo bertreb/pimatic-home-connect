@@ -6,7 +6,7 @@ module.exports = (env) ->
   HomeConnect = require('home-connect-js')
   CoffeeMaker = require('./devices/coffeemaker')(env)
   Oven = require('./devices/oven')(env)
-  Error = require('./devices/error.coffee')(env)
+  Error = require('./devices/error')(env)
 
   class HomeconnectPlugin extends env.plugins.Plugin
     init: (app, @framework, @config) =>
