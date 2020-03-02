@@ -4,9 +4,8 @@ module.exports = (env) ->
   M = env.matcher
   _ = require('lodash')
   HomeConnect = require('home-connect-js')
-  CoffeeMaker = require('./devices/coffeemaker')(env)
-  Oven = require('./devices/oven')(env)
-  Error = require('./devices/error')(env)
+  Error = require('./error')(env)
+  Appliances = require('./appliances')(env)
 
   class HomeconnectPlugin extends env.plugins.Plugin
     init: (app, @framework, @config) =>
@@ -32,6 +31,8 @@ module.exports = (env) ->
         @emit 'homeconnect', 'offline'
         @errorHandler(error)
       )
+
+      @supportedTypes = ["CoffeeMaker","Oven"]
 
       @framework.deviceManager.registerDeviceClass('HomeconnectDevice', {
         configDef: @deviceConfigDef.HomeconnectDevice,
@@ -78,30 +79,10 @@ module.exports = (env) ->
       )
 
     getCl: (type) =>
-      _cl = null
-      switch type
-        when "CoffeeMaker"
-          _cl = "HomeconnectDevice"
-        when "Oven"
-          _cl = "HomeconnectDevice"
-          ###
-          when "Dryer"
-            _class = "Dryer"
-          when "Washer"
-            _class = "Washer"
-          when "Dishwasher"
-            _class = "Dishwasher"
-          when "FridgeFreezer"
-            _class = "FridgeFreezer"
-          when "Hood"
-            _class = "Hood"
-          when "Hob"
-            _class = "Hob"
-          ###
-        else
-          _cl = null
-      return _cl
-
+      if type in Applicances.supportedTypes
+        return "HomeconnectDevice"
+      else
+        return null
 
   class HomeconnectDevice extends env.devices.Device
 
@@ -117,9 +98,9 @@ module.exports = (env) ->
   
       switch @hatype
         when "CoffeeMaker"
-          @deviceAdapter = new CoffeeMaker()
+          @deviceAdapter = new Appliances.CoffeeMaker()
         when "Oven"
-          @deviceAdapter = new Oven()
+          @deviceAdapter = new Appliances.Oven()
         else
           env.logger.debug "Device type #{@hatype} not yet supported"
           return
