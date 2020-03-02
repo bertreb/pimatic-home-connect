@@ -42,6 +42,10 @@ module.exports = (env) ->
       @framework.on 'destroy', () =>
         @removeAllListeners()
 
+      @framework.on 'deviceAdded', (device) =>
+        if device.config.class is "HomeconnectDevice"
+          device.emit 'connectdevice'
+
       @framework.ruleManager.addActionProvider(new HomeconnectActionProvider(@framework))
 
       @framework.deviceManager.on('discover', (eventData) =>
@@ -118,9 +122,7 @@ module.exports = (env) ->
             return Promise.resolve @attributeValues[_attr]
           )
       
-
       # appliance option specific attributes
-      env.logger.info "@deviceAdapter.supportedOptions " + JSON.stringify(@deviceAdapter.supportedOptions,null,2)
       for _attr in @deviceAdapter.supportedOptions
         do (_attr) =>
           @attributes[_attr.name] =
@@ -135,7 +137,6 @@ module.exports = (env) ->
           )
 
       # appliance status specific attributes
-      env.logger.info "@deviceAdapter.supportedStatus " + JSON.stringify(@deviceAdapter.supportedStatus,null,2)
       for _attr in @deviceAdapter.supportedStatus
         do (_attr) =>
           @attributes[_attr.name] =
@@ -150,93 +151,96 @@ module.exports = (env) ->
           )
 
       @plugin.on 'homeconnect', () =>
-        checkConnected = () =>
-          @homeconnect.command('default', 'get_specific_appliance', @haid)
-          .then((status) => 
-            #env.logger.info "STATUS: " + JSON.stringify(status,null,2)
-            if status.body.data.connected
-              env.logger.debug "#{@hatype} #{@id} is connected "
-              @setAttr("status","connected")
-              @emit 'deviceconnected', ""
-            else
-              @checkConnectedTimer = setTimeout(checkConnected,5000)
-          )
-          .catch((err) =>
-            env.logger.debug "Retry checkConnected #{@hatype} #{@id} " + err
-            @checkConnectedTimer = setTimeout(checkConnected,5000)
-          )
-        checkConnected()
+        @emit 'connectdevice'
 
-
-      @on 'deviceconnected', () =>
-        @homeconnect.command('settings', 'get_settings', @haid)
-        .then((settings) =>
-          #env.logger.debug "#{@hatype} SETTINGS: " + JSON.stringify(settings,null,2)
-          data = settings.body.data
-          #@setProgramOrOption(data)
-          if data.settings?
-            for setting in data.settings
-              @setProgramOrOption(setting)
-          return @homeconnect.command('status_events', 'get_status', @haid)
-        )
-        .then((status) =>
-          #env.logger.info "#{@hatype} STATUS: " + JSON.stringify(status,null,2)
-          data = status.body.data
-          #@setProgramOrOption(data)
-          if data.status?
-            for status in data.status
-              @setProgramOrOption(status)
-          return @homeconnect.command('programs', 'get_selected_program', @haid)
-        )
-        .then((program) =>
-          #env.logger.info "#{@hatype} PROGRAM: " + JSON.stringify(program,null,2)
-          data = program.body.data
-          @setProgramOrOption(data)
-          if data.options?
-            for option in data.options
-              @setProgramOrOption(option)
-        )
-        .catch((err) =>
-          @error.errorHandler(error)(err)
-        )
-
-        @homeconnect.subscribe(@haid, 'NOTIFY', (info) =>
-          data = JSON.parse(info.data)
-          #env.logger.info "NOTIFY received from #{@haid}: " + JSON.stringify(data,null,2)
-          for item in data.items
-            @setProgramOrOption(item)
-        )
-        @homeconnect.subscribe(@haid, 'STATUS', (info) =>
-          data = JSON.parse(info.data)
-          #env.logger.info "STATUS received from #{@haid}: " + JSON.stringify(data,null,2)
-          for item in data.items
-            @setProgramOrOption(item)
-        )
-        @homeconnect.subscribe(@haid, 'EVENT', (info) =>
-          data = JSON.parse(info.data)
-          #env.logger.info "EVENT received from #{@haid}: " + JSON.stringify(data,null,2)
-          for item in data.items
-            @setProgramOrOption(item)
-        )
-        @homeconnect.subscribe(@haid, 'CONNECTED', () =>
-          env.logger.debug "Connected event received"
-        )
-        @homeconnect.subscribe(@haid, 'DISCONNECTED', () =>
-          env.logger.debug "Disconnected event received"
-        )
-        @homeconnect.subscribe(@haid, 'DEPAIRED', () =>
-          env.logger.debug "Depaired event received"
-        )
-        @homeconnect.subscribe(@haid, 'PAIRED', () =>
-          env.logger.debug "Paired event received"
-        )
-        @homeconnect.subscribe(@haid, 'KEEP-ALIVE', () =>
-          #env.logger.debug "Keep-alive event received"
-        )
-
+      @on 'connectdevice', @onConnectDevice    
+      @on 'deviceconnected', @onDeviceConnected
 
       super()
 
+    onConnectDevice: () =>
+      checkConnected = () =>
+        @homeconnect.command('default', 'get_specific_appliance', @haid)
+        .then((status) => 
+          #env.logger.info "STATUS: " + JSON.stringify(status,null,2)
+          if status.body.data.connected
+            env.logger.debug "#{@hatype} #{@id} is connected "
+            @setAttr("status","connected")
+            @emit 'deviceconnected', ""
+          else
+            @checkConnectedTimer = setTimeout(checkConnected,5000)
+        )
+        .catch((err) =>
+          env.logger.debug "Retry checkConnected #{@hatype} #{@id} " + err
+          @checkConnectedTimer = setTimeout(checkConnected,5000)
+        )
+      checkConnected()      
+
+    onDeviceConnected: () =>
+      @homeconnect.command('settings', 'get_settings', @haid)
+      .then((settings) =>
+        #env.logger.debug "#{@hatype} SETTINGS: " + JSON.stringify(settings,null,2)
+        data = settings.body.data
+        #@setProgramOrOption(data)
+        if data.settings?
+          for setting in data.settings
+            @setProgramOrOption(setting)
+        return @homeconnect.command('status_events', 'get_status', @haid)
+      )
+      .then((status) =>
+        #env.logger.info "#{@hatype} STATUS: " + JSON.stringify(status,null,2)
+        data = status.body.data
+        #@setProgramOrOption(data)
+        if data.status?
+          for status in data.status
+            @setProgramOrOption(status)
+        return @homeconnect.command('programs', 'get_selected_program', @haid)
+      )
+      .then((program) =>
+        #env.logger.info "#{@hatype} PROGRAM: " + JSON.stringify(program,null,2)
+        data = program.body.data
+        @setProgramOrOption(data)
+        if data.options?
+          for option in data.options
+            @setProgramOrOption(option)
+      )
+      .catch((err) =>
+        @error.errorHandler(error)(err)
+      )
+
+      @homeconnect.subscribe(@haid, 'NOTIFY', (info) =>
+        data = JSON.parse(info.data)
+        #env.logger.info "NOTIFY received from #{@haid}: " + JSON.stringify(data,null,2)
+        for item in data.items
+          @setProgramOrOption(item)
+      )
+      @homeconnect.subscribe(@haid, 'STATUS', (info) =>
+        data = JSON.parse(info.data)
+        #env.logger.info "STATUS received from #{@haid}: " + JSON.stringify(data,null,2)
+        for item in data.items
+          @setProgramOrOption(item)
+      )
+      @homeconnect.subscribe(@haid, 'EVENT', (info) =>
+        data = JSON.parse(info.data)
+        #env.logger.info "EVENT received from #{@haid}: " + JSON.stringify(data,null,2)
+        for item in data.items
+          @setProgramOrOption(item)
+      )
+      @homeconnect.subscribe(@haid, 'CONNECTED', () =>
+        env.logger.debug "Connected event received"
+      )
+      @homeconnect.subscribe(@haid, 'DISCONNECTED', () =>
+        env.logger.debug "Disconnected event received"
+      )
+      @homeconnect.subscribe(@haid, 'DEPAIRED', () =>
+        env.logger.debug "Depaired event received"
+      )
+      @homeconnect.subscribe(@haid, 'PAIRED', () =>
+        env.logger.debug "Paired event received"
+      )
+      @homeconnect.subscribe(@haid, 'KEEP-ALIVE', () =>
+        #env.logger.debug "Keep-alive event received"
+      )
 
     setProgramOrOption: (programOrOption) =>
         _attr = @getProgramOrOption(programOrOption)
@@ -347,7 +351,8 @@ module.exports = (env) ->
 
     destroy:() =>
       clearTimeout(@checkConnectedTimer)
-      @removeAllListeners()
+      @removeListener('connectdevice', @onConnectDevice)
+      @removeListener('deviceconnected', @onDeviceConnected)
       super()
 
 
