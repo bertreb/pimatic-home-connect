@@ -57,3 +57,7 @@ module.exports = (env) ->
         else
           env.logger.error "ErrorHandler: Unknown error #{error}"
 
+  return exports = {
+    Error
+  }
+

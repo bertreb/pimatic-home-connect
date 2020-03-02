@@ -13,7 +13,7 @@ module.exports = (env) ->
       pluginConfigDef = require './pimatic-home-connect-config-schema'
       @deviceConfigDef = require("./device-config-schema")
 
-      @errorHandler = new Error()
+      @error = new Error.Error()
 
       @clientId = @config.clientId 
       @clientSecret = @config.clientSecret #"a1b2c3d4";
@@ -44,22 +44,21 @@ module.exports = (env) ->
 
       @framework.ruleManager.addActionProvider(new HomeconnectActionProvider(@framework))
 
-      
       @framework.deviceManager.on('discover', (eventData) =>
         @framework.deviceManager.discoverMessage 'pimatic-home-connect', 'Searching for new devices'
         if @connected and @homeconnect?
           @homeconnect.command('default', 'get_home_appliances')
           .then((appliances) =>
             for appliance in appliances.body.data.homeappliances            
-              _did = appliance.haId.toLowerCase()
-              if _.find(@framework.deviceManager.devicesConfig,(d) => (d.id).indexOf(_did)>=0)
+              _did = (appliance.haId).toLowerCase()
+              if _.find(@framework.deviceManager.devicesConfig,(d) => d.id.indexOf(_did)>=0)
                 env.logger.info "Device '" + _did + "' already in config"
               else
-                if appliance.type in Applicances.supportedTypes
+                if appliance.type in @supportedTypes
                   config =
                     id: _did
                     name: appliance.name
-                    class: _class
+                    class: "HomeconnectDevice"
                     haid: appliance.haId
                     hatype: appliance.type
                     brand: appliance.brand
@@ -71,7 +70,7 @@ module.exports = (env) ->
                   #env.logger.info "Appliance '" + JSON.stringify(appliance,null,2)
           )
           .catch((error)=>
-            @errorHandler(error)
+            @error.errorHandler(error)
           )
         else
           env.logger.info "Home-connect offline"
@@ -82,7 +81,7 @@ module.exports = (env) ->
     constructor: (config, lastState, @plugin, @framework) ->
       @config = config
       @id = @config.id
-      @errorHandler = @plugin.errorHandler
+      @error = @plugin.error
 
       @name = @config.name
       @haid = @config.haid
@@ -190,7 +189,7 @@ module.exports = (env) ->
               @setProgramOrOption(option)
         )
         .catch((err) =>
-          @errorHandler(err)
+          @error.errorHandler(error)(err)
         )
 
         @homeconnect.subscribe(@haid, 'NOTIFY', (info) =>
