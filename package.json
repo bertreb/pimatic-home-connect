@@ -31,8 +31,7 @@
   "configSchema": "pimatic-home-connect-config-schema.coffee",
   "dependencies": {
     "home-connect-js": ">=0.1.3",
-    "lodash": "^4.17.15",
-    "node-machine-id": "^1.1.12"
+    "lodash": "^4.17.15"
   },
   "peerDependencies": {
     "pimatic": "0.9.*"
