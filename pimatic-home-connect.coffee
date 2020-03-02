@@ -83,6 +83,9 @@ module.exports = (env) ->
       @id = @config.id
       @error = @plugin.error
 
+      if @_destroyed
+        return
+
       @name = @config.name
       @haid = @config.haid
       @homeconnect = @plugin.homeconnect
@@ -100,6 +103,7 @@ module.exports = (env) ->
       @attributes = {}
       @attributeValues = {}
 
+
       #generic attributes
       attributesGeneric = ["program", "progress", "status"]
       for _attr in attributesGeneric
@@ -113,8 +117,10 @@ module.exports = (env) ->
           @_createGetter(_attr, =>
             return Promise.resolve @attributeValues[_attr]
           )
+      
 
       # appliance option specific attributes
+      env.logger.info "@deviceAdapter.supportedOptions " + JSON.stringify(@deviceAdapter.supportedOptions,null,2)
       for _attr in @deviceAdapter.supportedOptions
         do (_attr) =>
           @attributes[_attr.name] =
@@ -129,6 +135,7 @@ module.exports = (env) ->
           )
 
       # appliance status specific attributes
+      env.logger.info "@deviceAdapter.supportedStatus " + JSON.stringify(@deviceAdapter.supportedStatus,null,2)
       for _attr in @deviceAdapter.supportedStatus
         do (_attr) =>
           @attributes[_attr.name] =
@@ -140,7 +147,7 @@ module.exports = (env) ->
           @attributeValues[_attr.name] = _attr.default
           @_createGetter(_attr.name, =>
             return Promise.resolve @attributeValues[_attr.name]
-          )        
+          )
 
       @plugin.on 'homeconnect', () =>
         checkConnected = () =>
@@ -159,6 +166,7 @@ module.exports = (env) ->
             @checkConnectedTimer = setTimeout(checkConnected,5000)
           )
         checkConnected()
+
 
       @on 'deviceconnected', () =>
         @homeconnect.command('settings', 'get_settings', @haid)
@@ -225,6 +233,7 @@ module.exports = (env) ->
         @homeconnect.subscribe(@haid, 'KEEP-ALIVE', () =>
           #env.logger.debug "Keep-alive event received"
         )
+
 
       super()
 
