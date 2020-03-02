@@ -55,21 +55,20 @@ module.exports = (env) ->
               if _.find(@framework.deviceManager.devicesConfig,(d) => (d.id).indexOf(_did)>=0)
                 env.logger.info "Device '" + _did + "' already in config"
               else
-                _class = @getCl(appliance.type)
-              if _class?
-                config =
-                  id: _did
-                  name: appliance.name
-                  class: _class
-                  haid: appliance.haId
-                  hatype: appliance.type
-                  brand: appliance.brand
-                  enumber: appliance.enumber
-                  vib: appliance.vib
-                @framework.deviceManager.discoveredDevice( "Home-Connect", config.name, config)
-              else
-                env.logger.info "Appliance type #{appliance.type} not implemented."
-                #env.logger.info "Appliance '" + JSON.stringify(appliance,null,2)
+                if appliance.type in Applicances.supportedTypes
+                  config =
+                    id: _did
+                    name: appliance.name
+                    class: _class
+                    haid: appliance.haId
+                    hatype: appliance.type
+                    brand: appliance.brand
+                    enumber: appliance.enumber
+                    vib: appliance.vib
+                  @framework.deviceManager.discoveredDevice( "Home-Connect", config.name, config)
+                else
+                  env.logger.info "Appliance type #{appliance.type} not implemented."
+                  #env.logger.info "Appliance '" + JSON.stringify(appliance,null,2)
           )
           .catch((error)=>
             @errorHandler(error)
@@ -77,12 +76,6 @@ module.exports = (env) ->
         else
           env.logger.info "Home-connect offline"
       )
-
-    getCl: (type) =>
-      if type in Applicances.supportedTypes
-        return "HomeconnectDevice"
-      else
-        return null
 
   class HomeconnectDevice extends env.devices.Device
 
