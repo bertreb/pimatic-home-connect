@@ -11,9 +11,8 @@
     "pimatic-home-connect.coffee",
     "pimatic-home-connect-config-schema.coffee",
     "device-config-schema.coffee",
-    "devices/oven.coffee",
-    "devices/coffeemaker.coffee",
-    "devices/error.coffee",
+    "appliances",
+    "error",
     "README.md",
     "LICENSE",
     "HISTORY.md"
