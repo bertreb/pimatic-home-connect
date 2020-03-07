@@ -5,11 +5,12 @@ Instructions for installing the proof-of-concept.
 
 0. stop pimatic
 1. clone this repository in your node_modules (/home/pi/node_modules)
-2. copy the file main.js from the pimatic-home-connect directory to
+2. in the pimatic-home-connect directory run the command -> npm install home-connect-js
+3. copy the file main.js from the pimatic-home-connect directory to
    ./pimatic-home-connect/node_modules/home-connect-js (replace the file)
-3. add in the plugin config your clientId and clientSecret
-4. restart pimatic
-5. an authorisation approval screen will popup
+4. add in the plugin config your clientId and clientSecret
+5. restart pimatic
+6. an authorisation approval screen will popup
 
 The CoffeeMaker and the Oven are implemented in this poc.
 Devices must be added via the device discovery.
