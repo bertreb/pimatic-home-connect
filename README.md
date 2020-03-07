@@ -11,5 +11,5 @@ Instructions for installing the poc
 4. restart pimatic
 5. an authorisation approval screen will popup
 
-This concept will change in the future, and is only tested with the simulator appliances. Due to the security concept in this poc, do use it only in private LAN's!
+This concept will change in the future, and is only tested with the simulator appliances. Due to the security concept in this poc, use it only in private LAN's!
 Actions are not yet supported!
