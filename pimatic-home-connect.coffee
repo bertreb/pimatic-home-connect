@@ -168,11 +168,14 @@ module.exports = (env) ->
             @setAttr("status","connected")
             @emit 'deviceconnected', ""
           else
-            @checkConnectedTimer = setTimeout(checkConnected,5000)
+            @checkConnectedTimer = setTimeout(checkConnected,10000)
         )
         .catch((err) =>
-          env.logger.debug "Retry checkConnected #{@hatype} #{@id} " + err
-          @checkConnectedTimer = setTimeout(checkConnected,5000)
+          if err.message.indexOf('undefined') >= 0
+            env.logger.debug "Still offline, retry connect #{@hatype} #{@id}"
+          else
+            env.logger.debug "Retry checkConnected #{@hatype} #{@id} " + err
+          @checkConnectedTimer = setTimeout(checkConnected,10000)
         )
       checkConnected()      
 
