@@ -5,7 +5,7 @@ Instructions for installing the proof-of-concept.
 
 0. stop pimatic
 1. clone this repository in your node_modules (/home/pi/node_modules)
-2. in the pimatic-home-connect directory run the command -> npm install home-connect-js
+2. in the pimatic-home-connect directory run the command -> npm install
 3. copy the file main.js from the pimatic-home-connect directory to
    ./pimatic-home-connect/node_modules/home-connect-js (replace the file)
 4. add in the plugin config your clientId and clientSecret
