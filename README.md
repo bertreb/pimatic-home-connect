@@ -13,7 +13,7 @@ Instructions for installing the proof-of-concept.
 
 The CoffeeMaker and the Oven are implemented in this poc.
 Devices must be added via the device discovery.
-All devices are of the Pimatic HomeconnectDevice class.
+All devices are of the HomeconnectDevice class.
 
 This concept will change in the future, and is only tested with the simulator appliances. Due to the security concept in this poc, use it only in private LAN's!
 Actions are not yet supported!
