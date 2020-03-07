@@ -13,5 +13,6 @@ Instructions for installing the proof-of-concept.
 
 The CoffeeMaker and the Oven are implemented in this poc.
 Device must be added via the device discovery.
+
 This concept will change in the future, and is only tested with the simulator appliances. Due to the security concept in this poc, use it only in private LAN's!
 Actions are not yet supported!
