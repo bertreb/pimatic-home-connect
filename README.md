@@ -3,6 +3,11 @@ Pimatic plugin for connecting home-connect devices to Pimatic
 
 Instructions for installing the proof-of-concept.
 
+### HOME-CONNECT
+Create an application in your account on the (developers site of Home-connect)[https://developer.home-connect.com]
+Use Authorisation Code Grant Flow as authorisation type and  http://localhost:3000/o2c as redirect uri.
+
+### PIMATIC
 0. stop pimatic
 1. clone this repository in your node_modules (/home/pi/node_modules)
 2. in the pimatic-home-connect directory run the command -> npm install
