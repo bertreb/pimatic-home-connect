@@ -13,9 +13,11 @@ Use Authorisation Code Grant Flow as authorisation type and  http://localhost:30
 2. in the pimatic-home-connect directory run the command -> npm install
 3. copy the file main.js from the pimatic-home-connect directory to
    ./pimatic-home-connect/node_modules/home-connect-js (replace the file)
-4. add in the plugin config your clientId and clientSecret
+4. add the plugin to the config.json under "plugins"
 5. restart pimatic
-6. an authorisation approval screen will popup
+6. activate the plugin and add in the plugin config your clientId and clientSecret
+7  restart pimatic
+8. an authorisation approval screen will popup
 
 The CoffeeMaker and the Oven are implemented in this poc.
 Devices must be added via the device discovery.
