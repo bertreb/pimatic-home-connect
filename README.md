@@ -12,7 +12,7 @@ Use Authorisation Code Grant Flow as authorisation type and  http://localhost:30
 6. create a HomeconnectManager device and add your clientIdSim and clientSecretSim credentials (only Sim works!)
 7. start discovery and add simulator devices in the discovery
 
-The CoffeeMaker, Washer, DishWasher and Oven are implemented in this poc.
+The CoffeeMaker, Washer, DishWasher and Oven are implemented in this poc. The approval of the Home-Connect access rights is handled by the plugin. No popup screen!
 Devices must be added via the device discovery.
 All devices are of the HomeconnectDevice class.
 
