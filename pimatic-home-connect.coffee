@@ -34,7 +34,7 @@ module.exports = (env) ->
         @removeAllListeners()
 
       @framework.on 'deviceAdded', (device) =>
-        if device.config.class is "HomeconnectDevice"
+        if @connected and device.config.class is "HomeconnectDevice"
           device.emit 'connectdevice', ''
 
       @framework.ruleManager.addActionProvider(new HomeconnectActionProvider(@framework))
@@ -101,7 +101,7 @@ module.exports = (env) ->
       @simulation = if @config.simulation? then @config.simulation else true
       @clientId = if @simulation then @config.clientIdSim else @config.clientId
       @clientSecret = if @simulation then @config.clientSecretSim else @config.clientSecretSim
-      @connected = false
+      @plugin.connected = false
 
       @framework.variableManager.waitForInit()
       .then(()=>
