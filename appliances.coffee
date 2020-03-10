@@ -92,6 +92,30 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.OperationState"
+        },
+        {
+          name: "BeanContainerEmpty"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "ConsumerProducts.CoffeeMaker.Event.BeanContainerEmpty"
+        },
+        {
+          name: "WaterTankEmpty"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "ConsumerProducts.CoffeeMaker.Event.WaterTankEmpty"
+        },
+        {
+          name: "DripTrayFull"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "ConsumerProducts.CoffeeMaker.Event.DripTrayFull"
         }
       ]
       

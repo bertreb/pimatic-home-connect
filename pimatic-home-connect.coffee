@@ -287,6 +287,7 @@ module.exports = (env) ->
         env.logger.info "GET PROGRAM error:::::: " + JSON.stringify(err,null,2)
       )
       ###
+      #@plugin.homeconnect.getEvents()
       @plugin.homeconnect.getStatus(@haid)
       .then((status)=>
         for i,s of status
@@ -315,7 +316,7 @@ module.exports = (env) ->
       )
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
-        #env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+        env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
         if eventData.data?
           for d in eventData.data.items
             #env.logger.info "eventD: " + JSON.stringify(d,null,2)
@@ -410,10 +411,26 @@ module.exports = (env) ->
       #return new Promise((resolve, reject) =>
       #  reject()
       #)
-
-      executableCommand = true
-
       return new Promise((resolve, reject) =>
+        @plugin.homeconnect.getStatusSpecific(@haid,'BSH.Common.Status.LocalControlActive')
+        .then((LocalControlActive)=>
+          if LocalControlActive 
+            env.logger.debug "Action not executed, LocalControl is active, for device #{@haid}"
+            reject()
+          return @plugin.homeconnect.getStatusSpecific(@haid,'BSH.Common.Status.RemoteControlStartAllowed')
+        ).then((RemoteControlStartAllowed)=>
+          unless RemoteControlStartAllowed 
+            env.logger.debug "RemoteControlStart not allowed for device #{@haid}"
+            reject()
+          return @plugin.homeconnect.getStatusSpecific(@haid,'BSH.Common.Status.RemoteControlActive')
+        ).then((RemoteControlActive)=>
+          unless RemoteControlActive
+            env.logger.debug "RemoteControlActive not active"
+            reject()
+        ).catch((err)=>
+          env.logger.debug "LocalControlActive status not available"
+        )
+
         @plugin.homeconnect.getStatusSpecific(@haid, 'BSH.Common.Status.OperationState')
         .then((status) =>
           switch command

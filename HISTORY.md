@@ -18,3 +18,5 @@
 	* cleared authorisation url after authorisation
 * 20200310, v0.0.10
 	* added basic actions
+* 20200310, v0.0.11
+	* added extra event status info
