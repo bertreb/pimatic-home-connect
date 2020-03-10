@@ -278,6 +278,7 @@ module.exports = (env) ->
 
     onDeviceConnected: () =>
 
+      ###
       @plugin.homeconnect.getAvailablePrograms(@haid)
       .then((program) =>
         env.logger.info "GET PROGRAM:::::: " + JSON.stringify(program,null,2)
@@ -285,6 +286,7 @@ module.exports = (env) ->
       .catch((err)=>
         env.logger.info "GET PROGRAM error:::::: " + JSON.stringify(err,null,2)
       )
+      ###
       @plugin.homeconnect.getStatus(@haid)
       .then((status)=>
         for i,s of status
@@ -313,7 +315,7 @@ module.exports = (env) ->
       )
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
-        env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+        #env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
         if eventData.data?
           for d in eventData.data.items
             #env.logger.info "eventD: " + JSON.stringify(d,null,2)

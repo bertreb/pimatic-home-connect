@@ -16,3 +16,5 @@
 	* added live support
 * 20200310, v0.0.8
 	* cleared authorisation url after authorisation
+* 20200310, v0.0.10
+	* added basic actions
