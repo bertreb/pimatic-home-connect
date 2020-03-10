@@ -23,7 +23,7 @@ All devices are of the HomeconnectDevice class.
 This concept could change in the future, and is only for testing  with the simulator appliances. Due to the security concept in this poc, use it only in private LAN's!
 Actions are not yet supported!
 
-The interface with the Home-Connect api is based on the homeconnect_api.js written by Alexander Thoukydides.
+For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 
 ---
 **The minimum requirement for this plugin is for nodejs 8+!**
