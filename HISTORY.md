@@ -11,3 +11,4 @@
 	* improve logging
 	* added clearTimeout
 	* check on connected at restart and addDevice event
+* 20200310, v0.0.7

@@ -19,6 +19,45 @@ module.exports = (env) ->
       @homeconnect = null
       @connected = false
 
+      @simulation = if @config.simulation? then @config.simulation else true
+      @clientId = if @simulation then @config.clientIdSim else @config.clientId
+      @clientSecret = if @simulation then @config.clientSecretSim else @config.clientSecretSim
+
+      @framework.on 'after init', ()=>
+        @emit 'status', 'Initializing...'
+        storage.init()
+        .then((resp)=>
+          #env.logger.debug "Storage initialized" + JSON.stringify(resp,null,2)
+          storage.getItem('tokens')
+        )
+        .then((savedTokens) =>
+          env.logger.debug "Stored tokens retrieved" # + JSON.stringify(savedTokens,null,2)
+          @homeconnect = new HomeConnectAPI({
+            log:        env.logger,
+            clientID:   @clientId,
+            clientSecret: @clientSecret
+            simulator:  @simulation,
+            savedAuth:  savedTokens
+          }).on('auth_save', (tokens) =>
+            storage.setItem('tokens', tokens)
+            env.logger.debug 'Tokens saved'
+          ).on('auth_uri', (uri) =>
+            @emit 'authorise', uri
+            @emit 'status', "Please authorise using Link in label"
+            env.logger.info "Auth_uri: " + uri
+          )
+          @homeconnect.waitUntilAuthorised()
+          .then(()=>
+            @connected = true
+            @homeconnect.getAppliances()
+            .then((apps)=>
+              env.logger.info "Appliances: " + JSON.stringify(apps,null,2)
+              @emit 'homeconnect', 'online'
+              @emit 'status', (if @simulation then "simulation" else "live") + ", authorisation ok"
+            )
+          )
+        )
+
       @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher"]
 
       @framework.deviceManager.registerDeviceClass('HomeconnectManager', {
@@ -59,6 +98,7 @@ module.exports = (env) ->
                     brand: appliance.brand
                     enumber: appliance.enumber
                     vib: appliance.vib
+                    simulated: @simulation
                   @framework.deviceManager.discoveredDevice( "Home-Connect", config.name, config)
                 else
                   env.logger.info "Appliance type #{appliance.type} not implemented."
@@ -79,11 +119,12 @@ module.exports = (env) ->
       @name = @config.name
       @error = @plugin.error
 
+
       @attributes = {}
       @attributeValues = {}
 
       #generic attributes
-      attributesGeneric = ["authorise"]
+      attributesGeneric = ["status"]
       for _attr in attributesGeneric
         do (_attr) =>
           @attributes[_attr] =
@@ -96,49 +137,13 @@ module.exports = (env) ->
             return Promise.resolve @attributeValues[_attr]
           )
 
-      @setAttr("authorise","Authorisation ... starting")
+      @plugin.on 'authorise', (uri) =>
+        #env.logger.info "Authorise uri " + uri
+        @config.xLink = uri
 
-      @simulation = if @config.simulation? then @config.simulation else true
-      @clientId = if @simulation then @config.clientIdSim else @config.clientId
-      @clientSecret = if @simulation then @config.clientSecretSim else @config.clientSecretSim
-      @plugin.connected = false
+      @plugin.on 'status', (status) =>
+        @setAttr("status", status)
 
-      @framework.variableManager.waitForInit()
-      .then(()=>
-        storage.init()
-        .then((resp)=>
-          env.logger.info "Storage initialized " + JSON.stringify(resp,null,2)
-          storage.getItem('tokens')
-        )
-        .then((savedTokens) =>
-          #Connect to the Home Connect cloud
-          #env.logger.info "savedTokens: " + JSON.stringify(savedTokens,null,2)
-          @plugin.homeconnect = new HomeConnectAPI({
-              log:        env.logger,
-              clientID:   @clientId,
-              clientSecret: @clientSecret
-              simulator:  @simulation,
-              savedAuth:  savedTokens
-          }).on('auth_save', (tokens) =>
-              storage.setItem('tokens', tokens)
-              env.logger.info 'Home Connect authorisation token saved'
-          ).on('auth_uri', (uri) =>
-              @setAttr("authorise","Authorisation required ... click Link")
-              @xLink = uri
-              env.logger.info "Auth_uri: " + uri
-          )
-          @plugin.homeconnect.waitUntilAuthorised()
-          .then(()=>
-            @plugin.connected = true
-            @plugin.homeconnect.getAppliances()
-            .then((apps)=>
-              #env.logger.info "Appliances: " + JSON.stringify(apps,null,2)
-              @plugin.emit 'homeconnect', 'online'
-              @setAttr("authorise",(if @simulation then "Simulation" else "Live") + " Authorisation Ok")
-            )
-          )
-        )
-      )
       super()
 
     setAttr: (attr, _status) =>
@@ -197,6 +202,16 @@ module.exports = (env) ->
             return Promise.resolve @attributeValues[_attr]
           )
 
+      if @plugin.simulation and not @config.simulated 
+        env.logger.debug "Live device '#{@id}'' not started because of simulation mode"
+        @setAttr("status", 'offline')
+        return
+      if not @plugin.simulation and @config.simulated
+        env.logger.debug "Simulated device '#{@id}'' not started because of live mode"
+        @setAttr("status", 'offline')
+        return
+
+
       # appliance option specific attributes
       for _attr in @deviceAdapter.supportedOptions
         do (_attr) =>
@@ -243,7 +258,7 @@ module.exports = (env) ->
       checkConnected = () =>
         @plugin.homeconnect.getAppliance(@haid)
         .then((status) =>
-          env.logger.info "STATUS: " + JSON.stringify(status,null,2)
+          env.logger.debug "STATUS: " + JSON.stringify(status,null,2)
           if status.connected
             env.logger.debug "#{@hatype} #{@id} is connected "
             @setAttr("status","connected")

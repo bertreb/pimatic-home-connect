@@ -4,23 +4,7 @@ module.exports = {
     title: "HomeconnectManager config options"
     type: "object"
     extensions: ["xLink", "xAttributeOptions"]
-    properties:
-      clientId:
-        descpription: "The home-connect clientid"
-        type: "string"
-      clientSecret:
-        descpription: "The home-connect secret code"
-        type: "string"
-      simulation:
-        description: "If enabled the plugin will use the simulated Homme Appliences"
-        type: "boolean"
-        default: true
-      clientIdSim:
-        descpription: "The home-connect simulator Grant Flow clientid"
-        type: "string"
-      clientSecretSim:
-        descpription: "The home-connect simulator Grant Flow secret code"
-        type: "string"
+    properties: {}
   }
   HomeconnectDevice: {
     title: "HomeconnectDevice config options"
@@ -42,6 +26,9 @@ module.exports = {
       vib:
         description: "The Vertriebs Identifikations Bezeichner of the appliance"
         type: "string"
+      simulated:
+        descpription: "If the device is a simulated device"
+        type: "boolean"
     }
   }
 }

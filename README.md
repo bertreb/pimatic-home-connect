@@ -5,21 +5,27 @@ Instructions for installing the proof-of-concept.
 
 ### HOME-CONNECT
 Create an application in your account on the [developers site of Home-connect](https://developer.home-connect.com).
-Use Authorisation Code Grant Flow as authorisation type and  http://localhost:3000/o2c as redirect uri. The ClientId and ClientSecret of this application must be used as clientIdSim and clientSecretSim in the plugin.
+For the simulator usage Authorisation Code Grant Flow as authorisation type and  http://localhost:3000/o2c as redirect uri. The ClientId and ClientSecret of this application must be used as clientIdSim and clientSecretSim in the plugin.
+For live usage create another application and use Device Flow as authorisation type. The ClientId and ClientSecret of this application must be used as clientId and clientSecret in the plugin.
 
 ### PIMATIC
 1. install the plugin via the plugins page
-2. create a HomeconnectManager device and add your clientIdSim and clientSecretSim credentials (only Sim works!)
-3. start discovery and add simulator devices in the discovery
+2. add your credentials; clientId and clientSecret (for live) and clientIdSim and clientSecretSim (for simulator)
+3. set the plugin in simulator or live (simulator = false)
+4. restart pimatic
+5. create a HomeconnectManager device
+6. start discovery and add simulator devices in the discovery
 
-The CoffeeMaker, Washer, DishWasher and Oven are implemented in this poc. The approval of the Home-Connect access rights is handled by the plugin. No popup screen!
+The CoffeeMaker, Washer, DishWasher and Oven are implemented in this poc. In simulator mode the approval of the Home-Connect access rights is handled by the plugin. No popup screen!
+In Live mode the approval is done via the gui. In the HomeconnectManager device the link in the label is used for the authentication uri.
+
 Devices must be added via the device discovery.
-All devices are of the HomeconnectDevice class.
+All devices are of the HomeconnectDevice class. Simulator devices are disable in Live mode and Live devices are disables in simulator mode.
 
-This concept could change in the future, and is only for testing  with the simulator appliances. Due to the security concept in this poc, use it only in private LAN's!
+This concept could change in the future. Due to the security concept in this poc, use it only in private LAN's!
 Actions are not yet supported!
 
 For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 
 ---
-**The minimum requirement for this plugin is for nodejs 8+!**
+**The minimum requirement for this plugin is node v8+!**
