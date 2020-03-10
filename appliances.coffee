@@ -252,7 +252,15 @@ module.exports = (env) ->
           unit: "rpm"
           default: ""
           key: "LaundryCare.Washer.Option.SpinSpeed"
-        }
+        },
+        {
+          name: "ProgramProgress"
+          type: "string"
+          description: "ProgramProgress in %"
+          unit: "%"
+          default: ""
+          key: "BSH.Common.Option.ProgramProgress"
+        }        
       ]
 
       @supportedStatus = [

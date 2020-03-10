@@ -23,7 +23,13 @@ Devices must be added via the device discovery.
 All devices are of the HomeconnectDevice class. Simulator devices are disable in Live mode and Live devices are disables in simulator mode.
 
 This concept could change in the future. Due to the security concept in this poc, use it only in private LAN's!
-Actions are not yet supported!
+
+## Actions
+Actions can be executed via rules. The rule syntax is
+```
+hc <device id> [start, pause, resume, stop]
+```
+If an action is available is depending on the device capabilities and the allowed control scope.
 
 For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 

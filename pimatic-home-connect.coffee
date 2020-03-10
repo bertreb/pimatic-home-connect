@@ -212,7 +212,6 @@ module.exports = (env) ->
         @setAttr("status", 'offline')
         return
 
-
       # appliance option specific attributes
       for _attr in @deviceAdapter.supportedOptions
         do (_attr) =>
@@ -278,6 +277,14 @@ module.exports = (env) ->
         @checkConnectedTimer = setTimeout(checkConnected,10000)
 
     onDeviceConnected: () =>
+
+      @plugin.homeconnect.getAvailablePrograms(@haid)
+      .then((program) =>
+        env.logger.info "GET PROGRAM:::::: " + JSON.stringify(program,null,2)
+      )
+      .catch((err)=>
+        env.logger.info "GET PROGRAM error:::::: " + JSON.stringify(err,null,2)
+      )
       @plugin.homeconnect.getStatus(@haid)
       .then((status)=>
         for i,s of status
@@ -306,7 +313,7 @@ module.exports = (env) ->
       )
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
-        #env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+        env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
         if eventData.data?
           for d in eventData.data.items
             #env.logger.info "eventD: " + JSON.stringify(d,null,2)
@@ -324,7 +331,6 @@ module.exports = (env) ->
               for p in program.options
                 @setProgramOrOption(p)
           )
-
 
     setProgramOrOption: (programOrOption) =>
         _attr = @getProgramOrOption(programOrOption)
@@ -395,63 +401,84 @@ module.exports = (env) ->
 
       return null
 
-
-    execute: (device, command) =>
+    execute: (device, command, options) =>
       env.logger.debug "@attributes.OperationState '#{@attributeValues.OperationState}', command #{command}"
-      env.logger.info "Execution not implemented"
+      #env.logger.info "Execution not implemented"
 
-      return new Promise((resolve, reject) =>
-        reject()
-      )
+      #return new Promise((resolve, reject) =>
+      #  reject()
+      #)
 
       executableCommand = true
 
-      switch command
-        when "start"
-          if (@attributeValues.OperationState).indexOf("Ready") >= 0
-            body =
-              data:
-                key: "BSH.Common.Command.StartProgram"
-                value: true
-        when "stop"
-            body =
-              data:
-                key: "BSH.Common.Command.StopProgram"
-                value: true
-        when "pause"
-          if (@attributeValues.OperationState).indexOf("Run") >= 0
-            body =
-              data:
-                key: "BSH.Common.Command.PauseProgram"
-                value: true
-        when "resume"
-          if (@attributeValues.OperationState).indexOf("Pause") >= 0
-            body =
-              data:
-                key: "BSH.Common.Command.ResumeProgram"
-                value: true
-        else
-          executableCommand = false
-
-
       return new Promise((resolve, reject) =>
-        if executableCommand
-          @plugin.homeconnect.command('programs', 'start_program', @haid, body)
-          .then((res)=>
-            #env.logger.info "Device #{device.name}: program '#{command}' started"
-            env.logger.info "Program '#{command}' started"
-            resolve()
-          )
-          .catch((err) =>
-            @error.errorHandler(err)
-            reject(err)
-          )
-        else
-          #env.logger.info "Device #{device.name}: program '#{command}' not started"
-          env.logger.info "Program '#{command}' not started"
-          reject()
+        @plugin.homeconnect.getStatusSpecific(@haid, 'BSH.Common.Status.OperationState')
+        .then((status) =>
+          switch command
+            when "start"
+              activeStates = [
+                'BSH.Common.EnumType.OperationState.Ready',
+                'BSH.Common.EnumType.OperationState.Pause'
+              ]
+              if status.value in activeStates
+                @plugin.homeconnect.getSelectedProgram(@haid)
+                .then((selected)=>
+                  #env.logger.info "Selected " + JSON.stringify(selected,null,2)
+                  return @plugin.homeconnect.setActiveProgram(@haid,selected.key)
+                )
+                .then(()=>
+                    resolve()
+                )
+                .catch((err)=>
+                  env.logger.error "Error setActiveProgram "
+                )
+            when "stop"
+              activeStates = [
+                'BSH.Common.EnumType.OperationState.DelayedStart',
+                'BSH.Common.EnumType.OperationState.Run',
+                'BSH.Common.EnumType.OperationState.Pause',
+                'BSH.Common.EnumType.OperationState.ActionRequired'
+              ]
+              if status.value in activeStates
+                @plugin.homeconnect.stopActiveProgram(@haid)
+                .then(()=>
+                  resolve()
+                )
+                .catch((err)=>
+                  env.logger.error "Error stopActiveProgram"
+                )
+              else
+                reject()
+            when "pause"
+              activeStates = [
+                'BSH.Common.EnumType.OperationState.Run'
+              ]
+              if status.value in activeStates
+                @plugin.homeconnect.setCommand(@haid,'BSH.Common.Command.PauseProgram')
+                .then(()=>
+                  resolve()
+                )
+                .catch((err)=>
+                  env.logger.debug  "Handled Error setCommand PauseProgram: #{@haid} " + err.message
+                  reject()
+                )
+            when "resume"
+              activeStates = [
+                'BSH.Common.EnumType.OperationState.Pause'
+              ]
+              if status.value in activeStates
+                @plugin.homeconnect.setCommand(@haid,"BSH.Common.Command.ResumeProgram")
+                .then(()=>
+                  resolve()
+                )
+                .catch((err)=>
+                  env.logger.debug "Handled Error setCommand PauseProgram: #{@haid} - " + err.message
+                  reject()
+                )
+            else
+              reject()
+        )
       )
-
 
     destroy:() =>
       clearTimeout(@checkConnectedTimer)
@@ -470,6 +497,7 @@ module.exports = (env) ->
       homeconnectDevices = _(@framework.deviceManager.devices).values().filter(
         (device) => device.config.class == "HomeconnectDevice"
       ).value()
+      @options = []
 
       setCommand = (command) =>
         @command = command
@@ -517,7 +545,7 @@ module.exports = (env) ->
         return {
           token: match
           nextInput: input.substring(match.length)
-          actionHandler: new HomeconnectActionHandler(@framework, homeconnectDevice, @command)
+          actionHandler: new HomeconnectActionHandler(@framework, homeconnectDevice, @command, @options)
         }
       else
         return null
@@ -525,13 +553,13 @@ module.exports = (env) ->
 
   class HomeconnectActionHandler extends env.actions.ActionHandler
 
-    constructor: (@framework, @homeconnectDevice, @command) ->
+    constructor: (@framework, @homeconnectDevice, @command, @options) ->
 
     executeAction: (simulate) =>
       if simulate
         return __("would have cleaned \"%s\"", "")
       else
-        @homeconnectDevice.execute(@homeconnectDevice,@command)
+        @homeconnectDevice.execute(@homeconnectDevice,@command, @options)
         .then(()=>
           return __("\"%s\" Rule executed", @command)
         ).catch((err)=>
