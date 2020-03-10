@@ -287,7 +287,6 @@ module.exports = class HomeConnectAPI extends EventEmitter {
                     let token = await (this.simulator
                                        ? this.authCodeGrantFlow()
                                        : this.authDeviceFlow());
-                    console.log("TOKENS " + JSON.stringify(token,null,2));
                     this.tokenSave(token);
                 } else if (this.savedAuth[this.clientID].scopes) {
                     this.scopes = this.savedAuth[this.clientID].scopes;
@@ -466,8 +465,6 @@ module.exports = class HomeConnectAPI extends EventEmitter {
             }
         });
 
-        console.log("TOKENS000000 " + token)
-
         // Return the access token
         return token;
     }
@@ -569,7 +566,6 @@ module.exports = class HomeConnectAPI extends EventEmitter {
 
         // Issue the request
         let status = 'OK';
-        console.log("OPTIONS: " + JSON.stringify(options,null,2))
         try {
 
             return await requestPromise(options);

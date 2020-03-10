@@ -19,50 +19,6 @@ module.exports = (env) ->
       @homeconnect = null
       @connected = false
 
-      ###
-      @clientId = @config.clientId 
-      @clientSecret = @config.clientSecret
-
-      storage.init()
-      .then((resp)=>
-        env.logger.info "Storage initialized " + JSON.stringify(resp,null,2)
-        storage.getItem('tokens')
-      )
-      .then((savedTokens) =>
-        #Connect to the Home Connect cloud
-        #env.logger.info "savedTokens: " + JSON.stringify(savedTokens,null,2)
-        @homeconnect = new HomeConnectAPI({
-            #log:        this.log,
-            # User options from config.json
-            clientID:   @clientId,
-            clientSecret: @clientSecret
-            simulator:  true,
-            #language:   (this.config.language || {}).api,
-            #Saved access and refresh tokens
-            savedAuth:  savedTokens
-        }).on('auth_save', (tokens) =>
-            storage.setItem('tokens', tokens)
-            env.logger.info 'Home Connect authorisation token saved'
-        ).on('auth_uri', (uri) => 
-            #this.schema.setAuthorisationURI(uri);
-            #this.log(chalk.greenBright('Home Connect authorisation required.'
-            #                           + ' Please visit:'));
-            #this.log('    ' + chalk.greenBright.bold(uri));
-            env.logger.info "Auth_uri: " + uri
-        )
-        @homeconnect.waitUntilAuthorised()
-        .then(()=>
-          @connected = true
-          @homeconnect.getAppliances()
-          .then((apps)=>
-            #env.logger.info "Appliances: " + JSON.stringify(apps,null,2)
-            @emit 'homeconnect', 'online'
-          )
-        )
-
-      )
-      ###
-
       @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher"]
 
       @framework.deviceManager.registerDeviceClass('HomeconnectManager', {
@@ -158,22 +114,15 @@ module.exports = (env) ->
           #Connect to the Home Connect cloud
           #env.logger.info "savedTokens: " + JSON.stringify(savedTokens,null,2)
           @plugin.homeconnect = new HomeConnectAPI({
-              #log:        this.log,
-              # User options from config.json
+              log:        env.logger,
               clientID:   @clientId,
               clientSecret: @clientSecret
               simulator:  @simulation,
-              #language:   (this.config.language || {}).api,
-              #Saved access and refresh tokens
               savedAuth:  savedTokens
           }).on('auth_save', (tokens) =>
               storage.setItem('tokens', tokens)
               env.logger.info 'Home Connect authorisation token saved'
           ).on('auth_uri', (uri) => 
-              #this.schema.setAuthorisationURI(uri);
-              #this.log(chalk.greenBright('Home Connect authorisation required.'
-              #                           + ' Please visit:'));
-              #this.log('    ' + chalk.greenBright.bold(uri));
               @setAttr("authorise","Authorisation required ... click Link")
               @xLink = uri
               env.logger.info "Auth_uri: " + uri
