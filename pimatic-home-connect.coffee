@@ -3,37 +3,72 @@ module.exports = (env) ->
   assert = env.require 'cassert'
   M = env.matcher
   _ = require('lodash')
-  HomeConnect = require('home-connect-js')
   Error = require('./error')(env)
   Appliances = require('./appliances')(env)
+  HomeConnectAPI = require('./homeconnect_api.js')
+  storage = require 'node-persist'
+
 
   class HomeconnectPlugin extends env.plugins.Plugin
     init: (app, @framework, @config) =>
 
-      pluginConfigDef = require './pimatic-home-connect-config-schema'
+      @pluginConfigDef = require './pimatic-home-connect-config-schema'
       @deviceConfigDef = require("./device-config-schema")
 
       @error = new Error.Error()
-
-      @clientId = @config.clientId 
-      @clientSecret = @config.clientSecret #"a1b2c3d4";
-      @simulation = @config.simulation ? pluginConfigDef.properties.simulation.default
+      @homeconnect = null
       @connected = false
-      
-      @homeconnect = new HomeConnect(@clientId,@clientSecret)
-      @homeconnect.init( isSimulated: @simulation, secret: @framework.config.settings.authentication.secret )
-      .then(() =>
-        env.logger.debug "Home-connect online"
-        @connected = true
-        @emit 'homeconnect', 'online'
-      )
-      .catch((error)=>
-        @emit 'homeconnect', 'offline'
-        @errorHandler(error)
-      )
 
-      @supportedTypes = ["CoffeeMaker","Oven"]
+      ###
+      @clientId = @config.clientId 
+      @clientSecret = @config.clientSecret
 
+      storage.init()
+      .then((resp)=>
+        env.logger.info "Storage initialized " + JSON.stringify(resp,null,2)
+        storage.getItem('tokens')
+      )
+      .then((savedTokens) =>
+        #Connect to the Home Connect cloud
+        #env.logger.info "savedTokens: " + JSON.stringify(savedTokens,null,2)
+        @homeconnect = new HomeConnectAPI({
+            #log:        this.log,
+            # User options from config.json
+            clientID:   @clientId,
+            clientSecret: @clientSecret
+            simulator:  true,
+            #language:   (this.config.language || {}).api,
+            #Saved access and refresh tokens
+            savedAuth:  savedTokens
+        }).on('auth_save', (tokens) =>
+            storage.setItem('tokens', tokens)
+            env.logger.info 'Home Connect authorisation token saved'
+        ).on('auth_uri', (uri) => 
+            #this.schema.setAuthorisationURI(uri);
+            #this.log(chalk.greenBright('Home Connect authorisation required.'
+            #                           + ' Please visit:'));
+            #this.log('    ' + chalk.greenBright.bold(uri));
+            env.logger.info "Auth_uri: " + uri
+        )
+        @homeconnect.waitUntilAuthorised()
+        .then(()=>
+          @connected = true
+          @homeconnect.getAppliances()
+          .then((apps)=>
+            #env.logger.info "Appliances: " + JSON.stringify(apps,null,2)
+            @emit 'homeconnect', 'online'
+          )
+        )
+
+      )
+      ###
+
+      @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher"]
+
+      @framework.deviceManager.registerDeviceClass('HomeconnectManager', {
+        configDef: @deviceConfigDef.HomeconnectManager,
+        createCallback: (config, lastState) => new HomeconnectManager(config, lastState, @, @framework)
+      })
       @framework.deviceManager.registerDeviceClass('HomeconnectDevice', {
         configDef: @deviceConfigDef.HomeconnectDevice,
         createCallback: (config, lastState) => new HomeconnectDevice(config, lastState, @, @framework)
@@ -44,16 +79,16 @@ module.exports = (env) ->
 
       @framework.on 'deviceAdded', (device) =>
         if device.config.class is "HomeconnectDevice"
-          device.emit 'connectdevice'
+          device.emit 'connectdevice', ''
 
       @framework.ruleManager.addActionProvider(new HomeconnectActionProvider(@framework))
 
       @framework.deviceManager.on('discover', (eventData) =>
         @framework.deviceManager.discoverMessage 'pimatic-home-connect', 'Searching for new devices'
         if @connected and @homeconnect?
-          @homeconnect.command('default', 'get_home_appliances')
+          @homeconnect.getAppliances() #command('default', 'get_home_appliances')
           .then((appliances) =>
-            for appliance in appliances.body.data.homeappliances            
+            for appliance in appliances           
               _did = (appliance.haId).toLowerCase()
               if _.find(@framework.deviceManager.devicesConfig,(d) => d.id.indexOf(_did)>=0)
                 env.logger.info "Device '" + _did + "' already in config"
@@ -79,6 +114,93 @@ module.exports = (env) ->
         else
           env.logger.info "Home-connect offline"
       )
+ 
+  class HomeconnectManager extends env.devices.Device
+
+    constructor: (config, lastState, @plugin, @framework) ->
+      @config = config
+      @id = @config.id
+      @name = @config.name
+      @error = @plugin.error
+
+      @attributes = {}
+      @attributeValues = {}
+
+      #generic attributes
+      attributesGeneric = ["authorise"]
+      for _attr in attributesGeneric
+        do (_attr) =>
+          @attributes[_attr] =
+            description: _attr
+            type: "string"
+            label: _attr
+            acronym: _attr
+          @attributeValues[_attr] = ""
+          @_createGetter(_attr, =>
+            return Promise.resolve @attributeValues[_attr]
+          )
+
+      @setAttr("authorise","Authorisation ... starting")
+
+      @simulation = if @config.simulation? then @config.simulation else true
+      @clientId = if @simulation then @config.clientIdSim else @config.clientId
+      @clientSecret = if @simulation then @config.clientSecretSim else @config.clientSecretSim
+      @connected = false
+
+      @framework.variableManager.waitForInit()
+      .then(()=>
+        storage.init()
+        .then((resp)=>
+          env.logger.info "Storage initialized " + JSON.stringify(resp,null,2)
+          storage.getItem('tokens')
+        )
+        .then((savedTokens) =>
+          #Connect to the Home Connect cloud
+          #env.logger.info "savedTokens: " + JSON.stringify(savedTokens,null,2)
+          @plugin.homeconnect = new HomeConnectAPI({
+              #log:        this.log,
+              # User options from config.json
+              clientID:   @clientId,
+              clientSecret: @clientSecret
+              simulator:  @simulation,
+              #language:   (this.config.language || {}).api,
+              #Saved access and refresh tokens
+              savedAuth:  savedTokens
+          }).on('auth_save', (tokens) =>
+              storage.setItem('tokens', tokens)
+              env.logger.info 'Home Connect authorisation token saved'
+          ).on('auth_uri', (uri) => 
+              #this.schema.setAuthorisationURI(uri);
+              #this.log(chalk.greenBright('Home Connect authorisation required.'
+              #                           + ' Please visit:'));
+              #this.log('    ' + chalk.greenBright.bold(uri));
+              @setAttr("authorise","Authorisation required ... click Link")
+              @xLink = uri
+              env.logger.info "Auth_uri: " + uri
+          )
+          @plugin.homeconnect.waitUntilAuthorised()
+          .then(()=>
+            @plugin.connected = true
+            @plugin.homeconnect.getAppliances()
+            .then((apps)=>
+              #env.logger.info "Appliances: " + JSON.stringify(apps,null,2)
+              @plugin.emit 'homeconnect', 'online'
+              @setAttr("authorise",(if @simulation then "Simulation" else "Live") + " Authorisation Ok")
+            )
+          )
+        )
+      )
+      super()
+
+    setAttr: (attr, _status) =>
+      unless @attributeValues[attr] is _status
+        #env.logger.debug "attribute '" + attr + "' with type '" + @attributes[attr].type + "', is set to " + _status
+        @attributeValues[attr] = _status
+        @emit attr, _status
+
+    destroy: () =>
+      super()
+
 
   class HomeconnectDevice extends env.devices.Device
 
@@ -94,19 +216,23 @@ module.exports = (env) ->
       @haid = @config.haid
       @homeconnect = @plugin.homeconnect
       @hatype = @config.hatype
-  
+
+
       switch @hatype
         when "CoffeeMaker"
           @deviceAdapter = new Appliances.CoffeeMaker()
         when "Oven"
           @deviceAdapter = new Appliances.Oven()
+        when "Washer"
+          @deviceAdapter = new Appliances.Washer()
+        when "Dishwasher"
+          @deviceAdapter = new Appliances.Dishwasher()
         else
           env.logger.debug "Device type #{@hatype} not yet supported"
           return
       
       @attributes = {}
       @attributeValues = {}
-
 
       #generic attributes
       attributesGeneric = ["program", "progress", "status"]
@@ -150,8 +276,14 @@ module.exports = (env) ->
             return Promise.resolve @attributeValues[_attr.name]
           )
 
-      @plugin.on 'homeconnect', () =>
-        @emit 'connectdevice'
+      @plugin.on 'homeconnect', (state) =>
+        switch state
+          when "online"
+            @emit 'connectdevice'
+          when "offline"
+            env.logger.debug "Homeconnect offline"
+          else
+            env.logger.debug "Unknown homeconnect state received: " + state
 
       @on 'connectdevice', @onConnectDevice    
       @on 'deviceconnected', @onDeviceConnected
@@ -160,10 +292,10 @@ module.exports = (env) ->
 
     onConnectDevice: () =>
       checkConnected = () =>
-        @homeconnect.command('default', 'get_specific_appliance', @haid)
+        @plugin.homeconnect.getAppliance(@haid)
         .then((status) => 
-          #env.logger.info "STATUS: " + JSON.stringify(status,null,2)
-          if status.body.data.connected
+          env.logger.info "STATUS: " + JSON.stringify(status,null,2)
+          if status.connected
             env.logger.debug "#{@hatype} #{@id} is connected "
             @setAttr("status","connected")
             @emit 'deviceconnected', ""
@@ -171,79 +303,63 @@ module.exports = (env) ->
             @checkConnectedTimer = setTimeout(checkConnected,10000)
         )
         .catch((err) =>
-          if err.message.indexOf('undefined') >= 0
-            env.logger.debug "Still offline, retry connect #{@hatype} #{@id}"
-          else
-            env.logger.debug "Retry checkConnected #{@hatype} #{@id} " + err
+          env.logger.debug "Retry checkConnected #{@hatype} #{@id} " + err
           @checkConnectedTimer = setTimeout(checkConnected,10000)
         )
-      checkConnected()      
+      if @homeconnect? 
+        checkConnected()
+      else
+        @checkConnectedTimer = setTimeout(checkConnected,10000)
 
     onDeviceConnected: () =>
-      @homeconnect.command('settings', 'get_settings', @haid)
-      .then((settings) =>
-        #env.logger.debug "#{@hatype} SETTINGS: " + JSON.stringify(settings,null,2)
-        data = settings.body.data
-        #@setProgramOrOption(data)
-        if data.settings?
-          for setting in data.settings
-            @setProgramOrOption(setting)
-        return @homeconnect.command('status_events', 'get_status', @haid)
+      @plugin.homeconnect.getStatus(@haid)
+      .then((status)=>
+        for i,s of status
+          #env.logger.info "Status:::::: " + JSON.stringify(s,null,2)
+          @setProgramOrOption(s)
       )
-      .then((status) =>
-        #env.logger.info "#{@hatype} STATUS: " + JSON.stringify(status,null,2)
-        data = status.body.data
-        #@setProgramOrOption(data)
-        if data.status?
-          for status in data.status
-            @setProgramOrOption(status)
-        return @homeconnect.command('programs', 'get_selected_program', @haid)
+      @plugin.homeconnect.getSelectedProgram(@haid)
+      .then((program)=>
+        #env.logger.info "Program:: " + JSON.stringify(program,null,2)
+        @setProgramOrOption(program)
+        if program.options?
+          for p in program.options
+            @setProgramOrOption(p)
       )
-      .then((program) =>
-        #env.logger.info "#{@hatype} PROGRAM: " + JSON.stringify(program,null,2)
-        data = program.body.data
-        @setProgramOrOption(data)
-        if data.options?
-          for option in data.options
-            @setProgramOrOption(option)
+      @plugin.homeconnect.getSelectedProgramOptions(@haid)
+      .then((options)=>
+        for o in options
+          #env.logger.info "Options:::::: " + JSON.stringify(o,null,2)
+          @setProgramOrOption(o)
       )
-      .catch((err) =>
-        @error.errorHandler(error)(err)
+      @plugin.homeconnect.getSettings(@haid)
+      .then((settings)=>
+        for i,s of settings
+          #env.logger.info "Settings:::::: " + JSON.stringify(s,null,2)
+          @setProgramOrOption(s)
       )
+      #env.logger.info "Listening at events from #{@haid}"
+      @plugin.homeconnect.on @haid, (eventData) =>
+        env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+        if eventData.data?
+          for d in eventData.data.items
+            #env.logger.info "eventD: " + JSON.stringify(d,null,2)
+            @setProgramOrOption(d)
+            if d.options?
+              for option in d.options
+                @setProgramOrOption(option)
+        ###
+        if eventData.data?.items[0]?.key?
+          @plugin.homeconnect.getSelectedProgram(@haid)
+          .then((program)=>
+            env.logger.info "Program:: " + JSON.stringify(program,null,2)
+            @setProgramOrOption(program)
+            if program.options?
+              for p in program.options
+                @setProgramOrOption(p)
+          )
+        ###
 
-      @homeconnect.subscribe(@haid, 'NOTIFY', (info) =>
-        data = JSON.parse(info.data)
-        #env.logger.info "NOTIFY received from #{@haid}: " + JSON.stringify(data,null,2)
-        for item in data.items
-          @setProgramOrOption(item)
-      )
-      @homeconnect.subscribe(@haid, 'STATUS', (info) =>
-        data = JSON.parse(info.data)
-        #env.logger.info "STATUS received from #{@haid}: " + JSON.stringify(data,null,2)
-        for item in data.items
-          @setProgramOrOption(item)
-      )
-      @homeconnect.subscribe(@haid, 'EVENT', (info) =>
-        data = JSON.parse(info.data)
-        #env.logger.info "EVENT received from #{@haid}: " + JSON.stringify(data,null,2)
-        for item in data.items
-          @setProgramOrOption(item)
-      )
-      @homeconnect.subscribe(@haid, 'CONNECTED', () =>
-        env.logger.debug "Connected event received"
-      )
-      @homeconnect.subscribe(@haid, 'DISCONNECTED', () =>
-        env.logger.debug "Disconnected event received"
-      )
-      @homeconnect.subscribe(@haid, 'DEPAIRED', () =>
-        env.logger.debug "Depaired event received"
-      )
-      @homeconnect.subscribe(@haid, 'PAIRED', () =>
-        env.logger.debug "Paired event received"
-      )
-      @homeconnect.subscribe(@haid, 'KEEP-ALIVE', () =>
-        #env.logger.debug "Keep-alive event received"
-      )
 
     setProgramOrOption: (programOrOption) =>
         _attr = @getProgramOrOption(programOrOption)
@@ -266,19 +382,27 @@ module.exports = (env) ->
     getProgramOrOption: (programOrOption) =>
 
       if (@deviceAdapter.selectedProgram).indexOf(programOrOption.key)>=0
+        if programOrOption.value?
+          _value = programOrOption.value
+        else
+          _value = programOrOption.key
         resultProg =
           name: "program"
-          value: @getLastValue(programOrOption.value)
+          value: @getLastValue(_value)
         return resultProg
 
-      prog = _.find(@deviceAdapter.programs, (p)=> (programOrOption.key).indexOf(p.name)>=0)
+      prog = _.find(@deviceAdapter.programs, (p)=> (p.name).indexOf(programOrOption.key)>=0)
       if prog?
+        if programOrOption.value?
+          _value = programOrOption.value
+        else
+          _value = programOrOption.key
         resultProg =
           name: "program"
-          value: @getLastValue(programOrOption.key)
+          value: @getLastValue(_value)
         return resultProg
 
-      opt = _.find(@deviceAdapter.supportedOptions, (o)=> (programOrOption.key).indexOf(o.key)>=0)
+      opt = _.find(@deviceAdapter.supportedOptions, (o)=> (o.key).indexOf(programOrOption.key)>=0)
       if opt?
         resultOpt = 
           name: opt.name
@@ -288,7 +412,7 @@ module.exports = (env) ->
           resultOpt["value"] = Math.floor(Number programOrOption.value)
         return resultOpt
 
-      stat = _.find(@deviceAdapter.supportedStatus, (s)=> (programOrOption.key).indexOf(s.key)>=0)
+      stat = _.find(@deviceAdapter.supportedStatus, (s)=> (s.key).indexOf(programOrOption.key)>=0)
       if stat?
         resultStat = 
           name: stat.name
@@ -298,7 +422,7 @@ module.exports = (env) ->
           resultStat["value"] = Math.floor(Number programOrOption.value)
         return resultStat
 
-      if (programOrOption.key).startsWith("BSH.Common.Option.ProgramProgress")
+      if ("BSH.Common.Option.ProgramProgress").indexOf(programOrOption.key)>=0
         resultPgrss = 
           name: "progress"
           value: programOrOption.value + " " + programOrOption.unit

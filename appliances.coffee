@@ -161,6 +161,14 @@ module.exports = (env) ->
           key: "BSH.Common.Option.RemainingProgramTime"
         },
         {
+          name: "ElapsedProgramTime"
+          type: "number"
+          description: ""
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.ElapsedProgramTime"
+        },
+        {
           name: "DoorState"
           type: "string"
           description: ""
@@ -194,7 +202,179 @@ module.exports = (env) ->
         }
       ]
 
+  class Washer
+    constructor: () ->
+      @programs = [
+        {name: "LaundryCare.Washer.Program.Cotton"},
+        {name: "LaundryCare.Washer.Program.EasyCare"},
+        {name: "LaundryCare.Washer.Program.Mix"},
+        {name: "LaundryCare.Washer.Program.DelicatesSilk"},
+        {name: "LaundryCare.Washer.Program.Wool"},
+        {name: "LaundryCare.Washer.Program.Sensitive"},
+        {name: "LaundryCare.Washer.Program.Auto30"},
+        {name: "LaundryCare.Washer.Program.Auto40"},
+        {name: "LaundryCare.Washer.Program.Auto60"},
+        {name: "LaundryCare.Washer.Program.Chiffon"},
+        {name: "LaundryCare.Washer.Program.Curtains"},
+        {name: "LaundryCare.Washer.Program.DarkWash"},
+        {name: "LaundryCare.Washer.Program.Dessous"},
+        {name: "LaundryCare.Washer.Program.Monsoon"},
+        {name: "LaundryCare.Washer.Program.Outdoor"},
+        {name: "LaundryCare.Washer.Program.PlushToy"},
+        {name: "LaundryCare.Washer.Program.ShirtsBlouses"},
+        {name: "LaundryCare.Washer.Program.Outdoor"},
+        {name: "LaundryCare.Washer.Program.SportFitness"},
+        {name: "LaundryCare.Washer.Program.Towels"},
+        {name: "LaundryCare.Washer.Program.WaterProof"}
+      ]
+      @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @supportedOptions = [
+        {
+          name: "RemainingProgramTime"
+          type: "number"
+          description: "RemainingProgramTime in seconds"
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.RemainingProgramTime"
+        },
+        {
+          name: "Temperature"
+          type: "string"
+          description: ""
+          unit: "°C"
+          default: ""
+          key: "LaundryCare.Washer.Option.Temperature"
+        },
+        {
+          name: "SpinSpeed"
+          type: "string"
+          description: "SpinSpeed in rpm"
+          unit: "rpm"
+          default: ""
+          key: "LaundryCare.Washer.Option.SpinSpeed"
+        }
+      ]
+
+      @supportedStatus = [
+        {
+          name: "DoorState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "Closed"
+          key: "BSH.Common.Status.DoorState"
+        },
+        {
+          name: "RemoteControl"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.RemoteControlActive"
+        },
+        {
+          name: "OperationState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.OperationState"
+        },
+        {
+          name: "RemoteControlStartAllowed"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.RemoteControlStartAllowed"
+        }
+      ]
+
+  class Dishwasher
+    constructor: () ->
+      @programs = [
+        {name: "Dishcare.Dishwasher.Program.Auto1"},
+        {name: "Dishcare.Dishwasher.Program.Auto2"},
+        {name: "Dishcare.Dishwasher.Program.Auto3"},
+        {name: "Dishcare.Dishwasher.Program.Eco50"},
+        {name: "Dishcare.Dishwasher.Program.Quick45"},
+        {name: "Dishcare.Dishwasher.Program.Intensiv70"},
+        {name: "Dishcare.Dishwasher.Program.Normal65"},
+        {name: "Dishcare.Dishwasher.Program.Glas40"},
+        {name: "Dishcare.Dishwasher.Program.GlassCare"},
+        {name: "Dishcare.Dishwasher.Program.NightWash"},
+        {name: "Dishcare.Dishwasher.Program.Quick65"},
+        {name: "Dishcare.Dishwasher.Program.Normal45"},
+        {name: "Dishcare.Dishwasher.Program.Intensiv45"},
+        {name: "Dishcare.Dishwasher.Program.AutoHalfLoad"},
+        {name: "Dishcare.Dishwasher.Program.IntensivPower"},
+        {name: "Dishcare.Dishwasher.Program.MagicDaily"},
+        {name: "Dishcare.Dishwasher.Program.Super60"},
+        {name: "Dishcare.Dishwasher.Program.Kurz60"},
+        {name: "Dishcare.Dishwasher.Program.ExpressSparkle65"},
+        {name: "Dishcare.Dishwasher.Program.MachineCare"},
+        {name: "Dishcare.Dishwasher.Program.SteamFresh"},
+        {name: "Dishcare.Dishwasher.Program.MaximumCleaning"}
+      ]
+      @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @supportedOptions = [
+        {
+          name: "RemainingProgramTime"
+          type: "number"
+          description: "RemainingProgramTime in seconds"
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.RemainingProgramTime"
+        },
+        {
+          name: "StartInRelative"
+          type: "number"
+          description: "delayed start in seconds"
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.StartInRelative"
+        }
+      ]
+
+      @supportedStatus = [
+        {
+          name: "DoorState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "Closed"
+          key: "BSH.Common.Status.DoorState"
+        },
+        {
+          name: "RemoteControl"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.RemoteControlActive"
+        },
+        {
+          name: "OperationState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.OperationState"
+        },
+        {
+          name: "RemoteControlStartAllowed"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.RemoteControlStartAllowed"
+        }
+      ]
+
+
   return exports = {
     CoffeeMaker
     Oven
+    Washer
+    Dishwasher
   }
