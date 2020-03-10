@@ -44,7 +44,7 @@ module.exports = (env) ->
         if @connected and @homeconnect?
           @homeconnect.getAppliances() #command('default', 'get_home_appliances')
           .then((appliances) =>
-            for appliance in appliances           
+            for appliance in appliances
               _did = (appliance.haId).toLowerCase()
               if _.find(@framework.deviceManager.devicesConfig,(d) => d.id.indexOf(_did)>=0)
                 env.logger.info "Device '" + _did + "' already in config"
@@ -70,7 +70,7 @@ module.exports = (env) ->
         else
           env.logger.info "Home-connect offline"
       )
- 
+
   class HomeconnectManager extends env.devices.Device
 
     constructor: (config, lastState, @plugin, @framework) ->
@@ -122,7 +122,7 @@ module.exports = (env) ->
           }).on('auth_save', (tokens) =>
               storage.setItem('tokens', tokens)
               env.logger.info 'Home Connect authorisation token saved'
-          ).on('auth_uri', (uri) => 
+          ).on('auth_uri', (uri) =>
               @setAttr("authorise","Authorisation required ... click Link")
               @xLink = uri
               env.logger.info "Auth_uri: " + uri
@@ -163,7 +163,7 @@ module.exports = (env) ->
 
       @name = @config.name
       @haid = @config.haid
-      @homeconnect = @plugin.homeconnect
+      #@homeconnect = @plugin.homeconnect
       @hatype = @config.hatype
 
 
@@ -179,7 +179,7 @@ module.exports = (env) ->
         else
           env.logger.debug "Device type #{@hatype} not yet supported"
           return
-      
+
       @attributes = {}
       @attributeValues = {}
 
@@ -196,7 +196,7 @@ module.exports = (env) ->
           @_createGetter(_attr, =>
             return Promise.resolve @attributeValues[_attr]
           )
-      
+
       # appliance option specific attributes
       for _attr in @deviceAdapter.supportedOptions
         do (_attr) =>
@@ -234,7 +234,7 @@ module.exports = (env) ->
           else
             env.logger.debug "Unknown homeconnect state received: " + state
 
-      @on 'connectdevice', @onConnectDevice    
+      @on 'connectdevice', @onConnectDevice
       @on 'deviceconnected', @onDeviceConnected
 
       super()
@@ -242,7 +242,7 @@ module.exports = (env) ->
     onConnectDevice: () =>
       checkConnected = () =>
         @plugin.homeconnect.getAppliance(@haid)
-        .then((status) => 
+        .then((status) =>
           env.logger.info "STATUS: " + JSON.stringify(status,null,2)
           if status.connected
             env.logger.debug "#{@hatype} #{@id} is connected "
@@ -255,7 +255,7 @@ module.exports = (env) ->
           env.logger.debug "Retry checkConnected #{@hatype} #{@id} " + err
           @checkConnectedTimer = setTimeout(checkConnected,10000)
         )
-      if @homeconnect? 
+      if @plugin.homeconnect?
         checkConnected()
       else
         @checkConnectedTimer = setTimeout(checkConnected,10000)
@@ -353,7 +353,7 @@ module.exports = (env) ->
 
       opt = _.find(@deviceAdapter.supportedOptions, (o)=> (o.key).indexOf(programOrOption.key)>=0)
       if opt?
-        resultOpt = 
+        resultOpt =
           name: opt.name
         if opt.type is "string"
           resultOpt["value"] = @getLastValue(programOrOption.value)
@@ -363,7 +363,7 @@ module.exports = (env) ->
 
       stat = _.find(@deviceAdapter.supportedStatus, (s)=> (s.key).indexOf(programOrOption.key)>=0)
       if stat?
-        resultStat = 
+        resultStat =
           name: stat.name
         if stat.type is "string"
           resultStat["value"] = @getLastValue(programOrOption.value)
@@ -372,18 +372,18 @@ module.exports = (env) ->
         return resultStat
 
       if ("BSH.Common.Option.ProgramProgress").indexOf(programOrOption.key)>=0
-        resultPgrss = 
+        resultPgrss =
           name: "progress"
           value: programOrOption.value + " " + programOrOption.unit
         return resultPgrss
 
       return null
 
-  
+
     execute: (device, command) =>
       env.logger.debug "@attributes.OperationState '#{@attributeValues.OperationState}', command #{command}"
       env.logger.info "Execution not implemented"
-      
+
       return new Promise((resolve, reject) =>
         reject()
       )
@@ -393,24 +393,24 @@ module.exports = (env) ->
       switch command
         when "start"
           if (@attributeValues.OperationState).indexOf("Ready") >= 0
-            body = 
+            body =
               data:
                 key: "BSH.Common.Command.StartProgram"
-                value: true          
+                value: true
         when "stop"
-            body = 
+            body =
               data:
                 key: "BSH.Common.Command.StopProgram"
                 value: true
         when "pause"
           if (@attributeValues.OperationState).indexOf("Run") >= 0
-            body = 
+            body =
               data:
                 key: "BSH.Common.Command.PauseProgram"
-                value: true          
+                value: true
         when "resume"
           if (@attributeValues.OperationState).indexOf("Pause") >= 0
-            body = 
+            body =
               data:
                 key: "BSH.Common.Command.ResumeProgram"
                 value: true
@@ -420,11 +420,11 @@ module.exports = (env) ->
 
       return new Promise((resolve, reject) =>
         if executableCommand
-          @homeconnect.command('programs', 'start_program', @haid, body)
+          @plugin.homeconnect.command('programs', 'start_program', @haid, body)
           .then((res)=>
             #env.logger.info "Device #{device.name}: program '#{command}' started"
             env.logger.info "Program '#{command}' started"
-            resolve()            
+            resolve()
           )
           .catch((err) =>
             @error.errorHandler(err)
@@ -458,7 +458,7 @@ module.exports = (env) ->
       setCommand = (command) =>
         @command = command
 
- 
+
       m = M(input, context)
         .match('hc ')
         .matchDevice(homeconnectDevices, (m, d) ->
@@ -473,7 +473,7 @@ module.exports = (env) ->
             return m.match(' start', (m) =>
               setCommand('start')
               match = m.getFullMatch()
-            )      
+            )
           ),
           ((m) =>
             return m.match(' stop', (m) =>
