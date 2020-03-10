@@ -248,6 +248,7 @@ module.exports = (env) ->
             env.logger.debug "#{@hatype} #{@id} is connected "
             @setAttr("status","connected")
             @emit 'deviceconnected', ""
+            clearTimeout(@checkConnectedTimer)
           else
             @checkConnectedTimer = setTimeout(checkConnected,10000)
         )
@@ -289,7 +290,7 @@ module.exports = (env) ->
       )
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
-        env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+        #env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
         if eventData.data?
           for d in eventData.data.items
             #env.logger.info "eventD: " + JSON.stringify(d,null,2)
@@ -297,17 +298,16 @@ module.exports = (env) ->
             if d.options?
               for option in d.options
                 @setProgramOrOption(option)
-        ###
-        if eventData.data?.items[0]?.key?
+        
+        if eventData.data?.items[0]?.key is "BSH.Common.Root.SelectedProgram"
           @plugin.homeconnect.getSelectedProgram(@haid)
           .then((program)=>
-            env.logger.info "Program:: " + JSON.stringify(program,null,2)
+            #env.logger.info "Program:: " + JSON.stringify(program,null,2)
             @setProgramOrOption(program)
             if program.options?
               for p in program.options
                 @setProgramOrOption(p)
           )
-        ###
 
 
     setProgramOrOption: (programOrOption) =>
