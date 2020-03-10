@@ -12,3 +12,7 @@
 	* added clearTimeout
 	* check on connected at restart and addDevice event
 * 20200310, v0.0.7
+	* move credentials and simulator/live switch to plugin config
+	* added live support
+* 20200310, v0.0.8
+	* cleared authorisation url after authorisation

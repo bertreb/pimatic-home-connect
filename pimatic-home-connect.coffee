@@ -54,6 +54,7 @@ module.exports = (env) ->
               env.logger.info "Appliances: " + JSON.stringify(apps,null,2)
               @emit 'homeconnect', 'online'
               @emit 'status', (if @simulation then "simulation" else "live") + ", authorisation ok"
+              @emit 'authorise', '' # clear authorisation uri
             )
           )
         )
@@ -138,7 +139,7 @@ module.exports = (env) ->
           )
 
       @plugin.on 'authorise', (uri) =>
-        #env.logger.info "Authorise uri " + uri
+        env.logger.info "Authorise uri " + uri
         @config.xLink = uri
 
       @plugin.on 'status', (status) =>
