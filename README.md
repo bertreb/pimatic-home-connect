@@ -5,7 +5,7 @@ Instructions for installing the proof-of-concept.
 
 ### HOME-CONNECT
 Create an application in your account on the [developers site of Home-connect](https://developer.home-connect.com).
-Use Authorisation Code Grant Flow as authorisation type and  http://localhost:3000/o2c as redirect uri.
+Use Authorisation Code Grant Flow as authorisation type and  http://localhost:3000/o2c as redirect uri. These ClientId and ClientSecret must be used as clientIdSim and clientSecretSim in the plugin.
 
 ### PIMATIC
 0. install the plugin via the plugins page
