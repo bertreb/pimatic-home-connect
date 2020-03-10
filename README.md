@@ -27,7 +27,7 @@ This concept could change in the future. Due to the security concept in this poc
 ## Actions
 Actions can be executed via rules. The rule syntax is
 ```
-hc <device id> [start, pause, resume, stop]
+homeconnect <device id or name> [start, pause, resume, stop]
 ```
 If an action is available is depending on the device capabilities and the allowed control scope.
 

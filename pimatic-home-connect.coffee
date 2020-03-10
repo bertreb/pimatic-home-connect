@@ -504,7 +504,7 @@ module.exports = (env) ->
 
 
       m = M(input, context)
-        .match('hc ')
+        .match('homeconnect ')
         .matchDevice(homeconnectDevices, (m, d) ->
           # Already had a match with another device?
           if homeconnectDevice? and homeconnectDevices.id isnt d.id
