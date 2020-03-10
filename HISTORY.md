@@ -5,3 +5,5 @@
 	* proof of concept release
 * 20200310, v0.0.3
 	* new proof of concept with different api lib
+* 20200310, v0.0.4
+	* fix
