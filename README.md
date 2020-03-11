@@ -14,13 +14,15 @@ For live usage create another application and use Device Flow as authorisation t
 3. set the plugin in simulator or live (simulator = false)
 4. restart Pimatic
 5. create a HomeconnectManager device
-6. start discovery and add simulator devices in the discovery
+6. start discovery and add discovered devices
 
 The devices CoffeeMaker, Washer, DishWasher, Oven, Dryer and FridgeFreezer are implemented. In simulator mode the approval of the Home-Connect access rights is handled by the plugin. No popup screen!
 In Live mode the approval is done via the gui. In the HomeconnectManager device the link in the label is used for the authentication uri.
 
 Devices must be added via the device discovery.
 All devices are of the HomeconnectDevice class. Simulator devices are disable in Live mode and Live devices are disables in simulator mode.
+
+Switching from Simulator mode to Live mode is done in the plugin config. After that a restart is required. Simulator devices are offline in Live mode and Live devices are offline in Simulator mode.
 
 ## Actions
 Actions can be executed via rules. The rule syntax is
