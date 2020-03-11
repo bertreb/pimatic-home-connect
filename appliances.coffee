@@ -68,6 +68,33 @@ module.exports = (env) ->
         }
       ]
 
+      @supportedEvents = [
+        {
+          name: "BeanContainerEmpty"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "ConsumerProducts.CoffeeMaker.Event.BeanContainerEmpty"
+        },
+        {
+          name: "WaterTankEmpty"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "ConsumerProducts.CoffeeMaker.Event.WaterTankEmpty"
+        },
+        {
+          name: "DripTrayFull"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "ConsumerProducts.CoffeeMaker.Event.DripTrayFull"
+        }
+      ] 
+
       @supportedStatus = [
         {
           name: "DoorState"
@@ -92,30 +119,6 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.OperationState"
-        },
-        {
-          name: "BeanContainerEmpty"
-          type: "string"
-          description: ""
-          unit: ""
-          default: "false"
-          key: "ConsumerProducts.CoffeeMaker.Event.BeanContainerEmpty"
-        },
-        {
-          name: "WaterTankEmpty"
-          type: "string"
-          description: ""
-          unit: ""
-          default: "false"
-          key: "ConsumerProducts.CoffeeMaker.Event.WaterTankEmpty"
-        },
-        {
-          name: "DripTrayFull"
-          type: "string"
-          description: ""
-          unit: ""
-          default: "false"
-          key: "ConsumerProducts.CoffeeMaker.Event.DripTrayFull"
         }
       ]
       
@@ -166,6 +169,33 @@ module.exports = (env) ->
           key: "Cooking.Oven.Option.FastPreHeat"
         }
       ]
+
+      @supportedEvents = [
+        {
+          name: "ProgramFinished"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramFinished"
+        },
+        {
+          name: "AlarmClockElapsed"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.AlarmClockElapsed"
+        },
+        {
+          name: "PreheatFinished"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "Cooking.Oven.Event.PreheatFinished"
+        }
+      ] 
 
       @supportedStatus = [
         {
@@ -287,6 +317,17 @@ module.exports = (env) ->
         }        
       ]
 
+      @supportedEvents = [
+        {
+          name: "ProgramFinished"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramFinished"
+        }
+      ]
+
       @supportedStatus = [
         {
           name: "DoorState"
@@ -365,6 +406,25 @@ module.exports = (env) ->
           unit: "sec"
           default: 0
           key: "BSH.Common.Option.StartInRelative"
+        }
+      ]
+
+      @supportedEvents = [
+        {
+          name: "ProgramAborted"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramAborted"
+        },
+        {
+          name: "ProgramFinished"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramFinished"
         }
       ]
 

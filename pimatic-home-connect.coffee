@@ -212,8 +212,29 @@ module.exports = (env) ->
         @setAttr("status", 'offline')
         return
 
-      # appliance option specific attributes
-      for _attr in @deviceAdapter.supportedOptions
+      attributesToBeAdded = [
+        @deviceAdapter.supportedOptions,
+        @deviceAdapter.supportedEvents,
+        @deviceAdapter.supportedStatus
+      ]
+      for supportedAttributes in attributesToBeAdded
+        # appliance option specific attributes
+        for _attr in supportedAttributes #@deviceAdapter.supportedOptions
+          do (_attr) =>
+            @attributes[_attr.name] =
+              description: _attr.name
+              type: _attr.type
+              label: _attr.name
+              acronym: _attr.name
+              unit: _attr.unit
+            @attributeValues[_attr.name] = _attr.default
+            @_createGetter(_attr.name, =>
+              return Promise.resolve @attributeValues[_attr.name]
+            )
+
+      ###
+      # appliance events specific attributes
+      for _attr in @deviceAdapter.supportedEvents
         do (_attr) =>
           @attributes[_attr.name] =
             description: _attr.name
@@ -239,6 +260,7 @@ module.exports = (env) ->
           @_createGetter(_attr.name, =>
             return Promise.resolve @attributeValues[_attr.name]
           )
+      ###
 
       @plugin.on 'homeconnect', (state) =>
         switch state
@@ -316,7 +338,7 @@ module.exports = (env) ->
       )
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
-        env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+        #env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
         if eventData.data?
           for d in eventData.data.items
             #env.logger.info "eventD: " + JSON.stringify(d,null,2)
@@ -395,6 +417,17 @@ module.exports = (env) ->
         else
           resultStat["value"] = Math.floor(Number programOrOption.value)
         return resultStat
+
+      evnt = _.find(@deviceAdapter.supportedEvents, (s)=> (s.key).indexOf(programOrOption.key)>=0)
+
+      if evnt?
+        resultEvnt =
+          name: evnt.name
+        if evnt.type is "string"
+          resultStat["value"] = @getLastValue(programOrOption.value)
+        else
+          resultStat["value"] = Math.floor(Number programOrOption.value)
+        return resultEvnt
 
       if ("BSH.Common.Option.ProgramProgress").indexOf(programOrOption.key)>=0
         resultPgrss =

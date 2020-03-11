@@ -20,3 +20,5 @@
 	* added basic actions
 * 20200310, v0.0.11
 	* added extra event status info
+* 20200311, v0.0.12
+	* added supported events status
