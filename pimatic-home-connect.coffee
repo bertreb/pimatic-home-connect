@@ -19,7 +19,7 @@ module.exports = (env) ->
       @homeconnect = null
       @connected = false
 
-      @simulation = true # if @config.simulation? then @config.simulation else true
+      @simulation = if @config.simulation? then @config.simulation else true
       @clientId = if @simulation then @config.clientIdSim else @config.clientId
       @clientSecret = if @simulation then @config.clientSecretSim else @config.clientSecretSim
 
@@ -279,29 +279,35 @@ module.exports = (env) ->
         for i,s of status
           #env.logger.info "Status:::::: " + JSON.stringify(s,null,2)
           @setProgramOrOption(s)
-        return @plugin.homeconnect.getSelectedProgram(@haid)
+      ).catch((err)=>
+        env.logger.debug "Error handled in startup getStatus " + err
       )
+      @plugin.homeconnect.getSelectedProgram(@haid)
       .then((program)=>
         #env.logger.info "Program:: " + JSON.stringify(program,null,2)
         @setProgramOrOption(program)
         if program.options?
           for p in program.options
             @setProgramOrOption(p)
-        return @plugin.homeconnect.getSelectedProgramOptions(@haid)
+      ).catch((err)=>
+        env.logger.debug "Error handled in startup getSelectedPrograms" + err
       )
+      @plugin.homeconnect.getSelectedProgramOptions(@haid)
       .then((options)=>
         for o in options
           #env.logger.info "Options:::::: " + JSON.stringify(o,null,2)
           @setProgramOrOption(o)
-        return @plugin.homeconnect.getSettings(@haid)
+      ).catch((err)=>
+        env.logger.debug "Error handled in startupGetSelectedProgramOptions " + err
       )
+      @plugin.homeconnect.getSettings(@haid)
       .then((settings)=>
         for i,s of settings
           #env.logger.info "Settings:::::: " + JSON.stringify(s,null,2)
           @setProgramOrOption(s)
       )
       .catch((err)=>
-        env.logger.debug "Error handled in startup " + err
+        env.logger.debug "Error handled in startup getSettings " + err
       )
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
