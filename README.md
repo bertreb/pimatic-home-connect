@@ -20,7 +20,7 @@ The devices CoffeeMaker, Washer, DishWasher, Oven, Dryer and FridgeFreezer are i
 In Live mode the approval is done via the gui. In the HomeconnectManager device the link in the label is used for the authentication uri.
 
 Devices must be added via the device discovery.
-All devices are of the HomeconnectDevice class. Simulator devices are disable in Live mode and Live devices are disables in simulator mode.
+All devices are of the HomeconnectDevice class.
 
 Switching from Simulator mode to Live mode is done in the plugin config. After that a restart is required. Simulator devices are offline in Live mode and Live devices are offline in Simulator mode.
 
