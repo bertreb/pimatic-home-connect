@@ -34,4 +34,4 @@ Whether an action is available, is depending on the device capabilities and the 
 For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 
 ---
-**The minimum requirement for this plugin is node v8+!**
+**The minimum requirement for this plugin is node v8!**
