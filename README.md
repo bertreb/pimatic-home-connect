@@ -12,7 +12,7 @@ For live usage create another application and use Device Flow as authorisation t
 1. install the plugin via the plugins page
 2. add your credentials; clientId and clientSecret (for live) and clientIdSim and clientSecretSim (for simulator)
 3. set the plugin in simulator or live (simulator = false)
-4. restart pimatic
+4. restart Pimatic
 5. create a HomeconnectManager device
 6. start discovery and add simulator devices in the discovery
 
