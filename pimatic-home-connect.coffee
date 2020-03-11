@@ -19,7 +19,7 @@ module.exports = (env) ->
       @homeconnect = null
       @connected = false
 
-      @simulation = if @config.simulation? then @config.simulation else true
+      @simulation = true # if @config.simulation? then @config.simulation else true
       @clientId = if @simulation then @config.clientIdSim else @config.clientId
       @clientSecret = if @simulation then @config.clientSecretSim else @config.clientSecretSim
 
@@ -31,12 +31,12 @@ module.exports = (env) ->
           storage.getItem('tokens')
         )
         .then((savedTokens) =>
-          env.logger.debug "Stored tokens retrieved" # + JSON.stringify(savedTokens,null,2)
+          #env.logger.debug "Stored tokens retrieved"  + JSON.stringify(savedTokens,null,2)
           @homeconnect = new HomeConnectAPI({
             log:        env.logger,
             clientID:   @clientId,
             clientSecret: @clientSecret
-            simulator:  @simulation,
+            simulator: @simulation,
             savedAuth:  savedTokens
           }).on('auth_save', (tokens) =>
             storage.setItem('tokens', tokens)
@@ -59,7 +59,7 @@ module.exports = (env) ->
           )
         )
 
-      @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher"]
+      @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher", "FridgeFreezer","Dryer"]
 
       @framework.deviceManager.registerDeviceClass('HomeconnectManager', {
         configDef: @deviceConfigDef.HomeconnectManager,
@@ -182,6 +182,10 @@ module.exports = (env) ->
           @deviceAdapter = new Appliances.Washer()
         when "Dishwasher"
           @deviceAdapter = new Appliances.Dishwasher()
+        when "FridgeFreezer"
+          @deviceAdapter = new Appliances.FridgeFreezer()
+        when "Dryer"
+          @deviceAdapter = new Appliances.Dryer()
         else
           env.logger.debug "Device type #{@hatype} not yet supported"
           return
@@ -232,36 +236,6 @@ module.exports = (env) ->
               return Promise.resolve @attributeValues[_attr.name]
             )
 
-      ###
-      # appliance events specific attributes
-      for _attr in @deviceAdapter.supportedEvents
-        do (_attr) =>
-          @attributes[_attr.name] =
-            description: _attr.name
-            type: _attr.type
-            label: _attr.name
-            acronym: _attr.name
-            unit: _attr.unit
-          @attributeValues[_attr.name] = _attr.default
-          @_createGetter(_attr.name, =>
-            return Promise.resolve @attributeValues[_attr.name]
-          )
-
-      # appliance status specific attributes
-      for _attr in @deviceAdapter.supportedStatus
-        do (_attr) =>
-          @attributes[_attr.name] =
-            description: _attr.name
-            type: _attr.type
-            label: _attr.name
-            acronym: _attr.name
-            unit: _attr.unit
-          @attributeValues[_attr.name] = _attr.default
-          @_createGetter(_attr.name, =>
-            return Promise.resolve @attributeValues[_attr.name]
-          )
-      ###
-
       @plugin.on 'homeconnect', (state) =>
         switch state
           when "online"
@@ -300,45 +274,38 @@ module.exports = (env) ->
 
     onDeviceConnected: () =>
 
-      ###
-      @plugin.homeconnect.getAvailablePrograms(@haid)
-      .then((program) =>
-        env.logger.info "GET PROGRAM:::::: " + JSON.stringify(program,null,2)
-      )
-      .catch((err)=>
-        env.logger.info "GET PROGRAM error:::::: " + JSON.stringify(err,null,2)
-      )
-      ###
-      #@plugin.homeconnect.getEvents()
       @plugin.homeconnect.getStatus(@haid)
       .then((status)=>
         for i,s of status
           #env.logger.info "Status:::::: " + JSON.stringify(s,null,2)
           @setProgramOrOption(s)
+        return @plugin.homeconnect.getSelectedProgram(@haid)
       )
-      @plugin.homeconnect.getSelectedProgram(@haid)
       .then((program)=>
         #env.logger.info "Program:: " + JSON.stringify(program,null,2)
         @setProgramOrOption(program)
         if program.options?
           for p in program.options
             @setProgramOrOption(p)
+        return @plugin.homeconnect.getSelectedProgramOptions(@haid)
       )
-      @plugin.homeconnect.getSelectedProgramOptions(@haid)
       .then((options)=>
         for o in options
           #env.logger.info "Options:::::: " + JSON.stringify(o,null,2)
           @setProgramOrOption(o)
+        return @plugin.homeconnect.getSettings(@haid)
       )
-      @plugin.homeconnect.getSettings(@haid)
       .then((settings)=>
         for i,s of settings
           #env.logger.info "Settings:::::: " + JSON.stringify(s,null,2)
           @setProgramOrOption(s)
       )
+      .catch((err)=>
+        env.logger.debug "Error handled in startup " + err
+      )
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
-        #env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+        env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
         if eventData.data?
           for d in eventData.data.items
             #env.logger.info "eventD: " + JSON.stringify(d,null,2)

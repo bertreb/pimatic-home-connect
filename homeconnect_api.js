@@ -22,11 +22,11 @@ const URL_SIMULATOR = 'https://simulator.home-connect.com';
 //   Hob-Control, Oven-Control, and FridgeFreezer-Images
 // The Home Connect simulator additionally disallows:
 //   CookProcessor-Control and FridgeFreezer-Control
-const SCOPES = ['IdentifyAppliance', 'Monitor', 'Settings', 'Control',
+const SCOPES = ['IdentifyAppliance', 'Monitor', 'Settings',
                'CleaningRobot-Control', 'CoffeeMaker-Control',
                'Dishwasher-Control', 'Dryer-Control', 'Freezer-Control',
                'Hood-Control', 'Refrigerator-Control', 'Washer-Control',
-               'WasherDryer-Control', 'WineCooler-Control', 'Oven-Control'];
+               'WasherDryer-Control', 'WineCooler-Control'];
 const SCOPES_LIVE = [...SCOPES, 'CookProcessor-Control',
                      'FridgeFreezer-Control'];
 const SCOPES_SIMULATOR = SCOPES;

@@ -22,3 +22,5 @@
 	* added extra event status info
 * 20200311, v0.0.12
 	* added supported events status
+* 20200311, v0.0.13
+	* added Dryer and FridgeFreezer

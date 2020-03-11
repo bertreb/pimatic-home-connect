@@ -1,7 +1,7 @@
 # pimatic-home-connect
-Pimatic plugin for connecting home-connect devices to Pimatic
+Pimatic plugin for connecting Home-Connect devices to Pimatic
 
-Instructions for installing the proof-of-concept.
+# Installation
 
 ### HOME-CONNECT
 Create an application in your account on the [developers site of Home-connect](https://developer.home-connect.com).
@@ -16,20 +16,18 @@ For live usage create another application and use Device Flow as authorisation t
 5. create a HomeconnectManager device
 6. start discovery and add simulator devices in the discovery
 
-The CoffeeMaker, Washer, DishWasher and Oven are implemented in this poc. In simulator mode the approval of the Home-Connect access rights is handled by the plugin. No popup screen!
+The devices CoffeeMaker, Washer, DishWasher, Oven, Dryer and FridgeFreezer are implemented. In simulator mode the approval of the Home-Connect access rights is handled by the plugin. No popup screen!
 In Live mode the approval is done via the gui. In the HomeconnectManager device the link in the label is used for the authentication uri.
 
 Devices must be added via the device discovery.
 All devices are of the HomeconnectDevice class. Simulator devices are disable in Live mode and Live devices are disables in simulator mode.
-
-This concept could change in the future. Due to the security concept in this poc, use it only in private LAN's!
 
 ## Actions
 Actions can be executed via rules. The rule syntax is
 ```
 homeconnect <device id or name> [start, pause, resume, stop]
 ```
-If an action is available is depending on the device capabilities and the allowed control scope.
+Whether an action is available, is depending on the device capabilities and the allowed control scope.
 
 For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 

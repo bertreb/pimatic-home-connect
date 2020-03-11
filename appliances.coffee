@@ -463,10 +463,207 @@ module.exports = (env) ->
         }
       ]
 
+  class FridgeFreezer
+    constructor: () ->
+      @programs = []
+      @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @supportedOptions = [
+        {
+          name: "SetpointTemperatureRefrigerator"
+          type: "number"
+          description: "SetpointTemperatureRefrigerator in °C"
+          unit: "°C"
+          default: 4
+          key: "Refrigeration.FridgeFreezer.Setting.SetpointTemperatureRefrigerator"
+        },
+        {
+          name: "SetpointTemperatureFreezer"
+          type: "number"
+          description: ""
+          unit: "°C"
+          default: -20
+          key: "Refrigeration.FridgeFreezer.Setting.SetpointTemperatureFreezer"
+        },
+        {
+          name: "SuperModeRefrigerator"
+          type: "string"
+          description: "SuperModeRefrigerator"
+          unit: ""
+          default: "false"
+          key: "Refrigeration.FridgeFreezer.Setting.SuperModeRefrigerator"
+        },     
+        {
+          name: "SuperModeFreezer"
+          type: "string"
+          description: "SuperModeFreezer"
+          unit: ""
+          default: "false"
+          key: "Refrigeration.FridgeFreezer.Setting.SuperModeFreezer"
+        },    
+        {
+          name: "ProgramProgress"
+          type: "string"
+          description: "ProgramProgress in %"
+          unit: "%"
+          default: ""
+          key: "BSH.Common.Option.ProgramProgress"
+        }        
+      ]
+
+      @supportedEvents = [
+        {
+          name: "DoorAlarmFreezer"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "Refrigeration.FridgeFreezer.Event.DoorAlarmFreezer"
+        },
+        {
+          name: "DoorAlarmRefrigerator"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "Refrigeration.FridgeFreezer.Event.DoorAlarmRefrigerator"
+        },
+        {
+          name: "TemperatureAlarmFreezer"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "Refrigeration.FridgeFreezer.Event.TemperatureAlarmFreezer"
+        }
+      ]
+
+      @supportedStatus = [
+        {
+          name: "DoorState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "Closed"
+          key: "BSH.Common.Status.DoorState"
+        },
+        {
+          name: "RemoteControl"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.RemoteControlActive"
+        },
+        {
+          name: "OperationState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.OperationState"
+        },
+        {
+          name: "RemoteControlStartAllowed"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.RemoteControlStartAllowed"
+        }
+      ]
+
+  class Dryer
+    constructor: () ->
+      @programs = [
+        {name: "LaundryCare.Washer.Program.Cotton"},
+        {name: "LaundryCare.Dryer.Program.Synthetic"},
+        {name: "LaundryCare.Washer.Program.Mix"},
+        {name: "LaundryCare.Washer.Program.Blankets"},
+        {name: "LaundryCare.Washer.Program.BusinessShirts"},
+        {name: "LaundryCare.Washer.Program.DownFeathers"},
+        {name: "LaundryCare.Washer.Program.Hygiene"},
+        {name: "LaundryCare.Washer.Program.Program.Jeans"},
+        {name: "LaundryCare.Washer.Program.Outdoor"},       
+        {name: "LaundryCare.Washer.Program.SyntheticRefresh"},       
+        {name: "LaundryCare.Washer.Program.Towels"},       
+        {name: "LaundryCare.Washer.Program.Delicates"},       
+        {name: "LaundryCare.Washer.Program.Super40"},        
+        {name: "LaundryCare.Washer.Program.Shirts15"},        
+        {name: "LaundryCare.Washer.Program.Pillow"},        
+        {name: "LaundryCare.Washer.Program.AntiShrink"}     
+      ]
+      @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @supportedOptions = [
+        {
+          name: "DryingTarget"
+          type: "string"
+          description: "DryingTarget"
+          unit: ""
+          default: ""
+          key: "LaundryCare.Dryer.Option.DryingTarget"
+        },
+        {
+          name: "ProgramProgress"
+          type: "string"
+          description: "ProgramProgress in %"
+          unit: "%"
+          default: ""
+          key: "BSH.Common.Option.ProgramProgress"
+        }        
+      ]
+
+      @supportedEvents = [
+        {
+          name: "ProgramFinished"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramFinished"
+        }
+      ]
+
+      @supportedStatus = [
+        {
+          name: "DoorState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "Closed"
+          key: "BSH.Common.Status.DoorState"
+        },
+        {
+          name: "RemoteControl"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.RemoteControlActive"
+        },
+        {
+          name: "OperationState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.OperationState"
+        },
+        {
+          name: "RemoteControlStartAllowed"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.RemoteControlStartAllowed"
+        }
+      ]
+
 
   return exports = {
     CoffeeMaker
     Oven
     Washer
     Dishwasher
+    Dryer
+    FridgeFreezer
   }
