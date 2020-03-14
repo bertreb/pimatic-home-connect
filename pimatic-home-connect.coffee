@@ -320,24 +320,27 @@ module.exports = (env) ->
       )
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
-        env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
-        if eventData.data?
-          for d in eventData.data.items
-            #env.logger.info "eventD: " + JSON.stringify(d,null,2)
-            @setProgramOrOption(d)
-            if d.options?
-              for option in d.options
-                @setProgramOrOption(option)
-        
-        if eventData.data?.items[0]?.key is "BSH.Common.Root.SelectedProgram"
-          @plugin.homeconnect.getSelectedProgram(@haid)
-          .then((program)=>
-            #env.logger.info "Program:: " + JSON.stringify(program,null,2)
-            @setProgramOrOption(program)
-            if program.options?
-              for p in program.options
-                @setProgramOrOption(p)
-          )
+        try
+          #env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+          if eventData.data?.items?.length?
+            for d in eventData.data.items
+              #env.logger.info "eventD: " + JSON.stringify(d,null,2)
+              @setProgramOrOption(d)
+              if d.options?
+                for option in d.options
+                  @setProgramOrOption(option)
+
+          if eventData.data?.items[0]?.key is "BSH.Common.Root.SelectedProgram"
+            @plugin.homeconnect.getSelectedProgram(@haid)
+            .then((program)=>
+              #env.logger.info "Program:: " + JSON.stringify(program,null,2)
+              @setProgramOrOption(program)
+              if program.options?
+                for p in program.options
+                  @setProgramOrOption(p)
+            )
+        catch err
+          env.logger.debug "Error handled in eventData " + err
 
     setProgramOrOption: (programOrOption) =>
         _attr = @getProgramOrOption(programOrOption)
@@ -406,9 +409,9 @@ module.exports = (env) ->
           resultEvnt =
             name: evnt.name
           if evnt.type is "string"
-            resultStat["value"] = @getLastValue(programOrOption.value)
+            resultStat["value"] = @getLastValue(programOrOption[evnt.valueField])
           else
-            resultStat["value"] = Math.floor(Number programOrOption.value)
+            resultStat["value"] = Math.floor(Number programOrOption[evnt.valueField])
           return resultEvnt
       catch err
         env.logger.debug "Error in event handled " + evnt
