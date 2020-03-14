@@ -23,7 +23,7 @@
     "pimatic",
     "home-connect"
   ],
-  "version": "0.0.17",
+  "version": "0.0.18",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/bertreb/pimatic-home-connect.git"

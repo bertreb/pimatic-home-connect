@@ -408,10 +408,17 @@ module.exports = (env) ->
         if evnt?
           resultEvnt =
             name: evnt.name
-          if evnt.type is "string"
-            resultStat["value"] = @getLastValue(programOrOption[evnt.valueField])
-          else
-            resultStat["value"] = Math.floor(Number programOrOption[evnt.valueField])
+          if (programOrOption.value).indexOf('BSH.Common.EnumType.EventPresentState')>=0
+            _state = @getLastValue(programOrOption.value)
+            switch _state
+              when "present"
+                resultEvent["value"] = true
+              when "off"
+                resultEvent["value"] = false
+              when "confirmed"
+                resultEvent["value"] = false
+              else
+                resultEvent["value"] = false
           return resultEvnt
       catch err
         env.logger.debug "Error in event handled " + evnt

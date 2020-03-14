@@ -76,7 +76,6 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "ConsumerProducts.CoffeeMaker.Event.BeanContainerEmpty"
-          valueField: "level"
         },
         {
           name: "WaterTankEmpty"
@@ -85,7 +84,6 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "ConsumerProducts.CoffeeMaker.Event.WaterTankEmpty"
-          valueField: "level"
         },
         {
           name: "DripTrayFull"
@@ -94,7 +92,6 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "ConsumerProducts.CoffeeMaker.Event.DripTrayFull"
-          valueField: "level"
         }
       ] 
 
