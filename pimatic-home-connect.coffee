@@ -31,13 +31,22 @@ module.exports = (env) ->
           storage.getItem('tokens')
         )
         .then((savedTokens) =>
+          #check if savedTokens are expired
+          #env.logger.info "savedTokens.timestamp: " + savedTokens.timestamp
+          #env.logger.info "1000*savedTokens.expires_in: " + 1000*savedTokens.expires_in
+          #env.logger.info "Date.now(): " + Date.now()
+
+          if (savedTokens.timestamp + 1000*savedTokens.expires_in) > Date.now() or not savedTokens?
+            _savedTokens = null # token expired
+          else
+            _savedTokens = savedTokens
           #env.logger.debug "Stored tokens retrieved"  + JSON.stringify(savedTokens,null,2)
           @homeconnect = new HomeConnectAPI({
             log:        env.logger,
             clientID:   @clientId,
             clientSecret: @clientSecret
             simulator: @simulation,
-            savedAuth:  savedTokens
+            savedAuth:  _savedTokens
           }).on('auth_save', (tokens) =>
             storage.setItem('tokens', tokens)
             env.logger.debug 'Tokens saved'
@@ -391,16 +400,18 @@ module.exports = (env) ->
           resultStat["value"] = Math.floor(Number programOrOption.value)
         return resultStat
 
-      evnt = _.find(@deviceAdapter.supportedEvents, (s)=> (s.key).indexOf(programOrOption.key)>=0)
-
-      if evnt?
-        resultEvnt =
-          name: evnt.name
-        if evnt.type is "string"
-          resultStat["value"] = @getLastValue(programOrOption.value)
-        else
-          resultStat["value"] = Math.floor(Number programOrOption.value)
-        return resultEvnt
+      try
+        evnt = _.find(@deviceAdapter.supportedEvents, (s)=> (s.key).indexOf(programOrOption.key)>=0)
+        if evnt?
+          resultEvnt =
+            name: evnt.name
+          if evnt.type is "string"
+            resultStat["value"] = @getLastValue(programOrOption.value)
+          else
+            resultStat["value"] = Math.floor(Number programOrOption.value)
+          return resultEvnt
+      catch err
+        env.logger.debug "Error in event handled " + evnt
 
       if ("BSH.Common.Option.ProgramProgress").indexOf(programOrOption.key)>=0
         resultPgrss =
@@ -532,7 +543,7 @@ module.exports = (env) ->
         .match('homeconnect ')
         .matchDevice(homeconnectDevices, (m, d) ->
           # Already had a match with another device?
-          if homeconnectDevice? and homeconnectDevices.id isnt d.id
+          if homeconnectDevice? and homeconnectDevice.id isnt d.id
             context?.addError(""""#{input.trim()}" is ambiguous.""")
             return
           homeconnectDevice = d
