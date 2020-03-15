@@ -28,3 +28,5 @@
 	* added error handling on event
 * 20200315, v0.0.20
 	* added appliances info
+* 20200315, v0.0.21
+	* added debug messages

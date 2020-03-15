@@ -321,7 +321,9 @@ module.exports = (env) ->
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
         try
-          #env.logger.info "Event " + JSON.stringify(eventData,null,2) + ", eventData? " + eventData.data?
+          env.logger.info "Event received =========== S T A R T ==================="
+          env.logger.info JSON.stringify(eventData,null,2)
+          env.logger.info "Event received ============= E N D ================="
           if eventData.data?.items?.length?
             for d in eventData.data.items
               #env.logger.info "eventD: " + JSON.stringify(d,null,2)
@@ -340,7 +342,7 @@ module.exports = (env) ->
                   @setProgramOrOption(p)
             )
         catch err
-          env.logger.debug "Error handled in eventData " + err
+          env.logger.debug "Error handled in received event " + err
 
     setProgramOrOption: (programOrOption) =>
         _attr = @getProgramOrOption(programOrOption)
