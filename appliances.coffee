@@ -65,7 +65,15 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "ConsumerProducts.CoffeeMaker.Option.BeanAmount"
-        }
+        },
+        {
+          name: "RemainingProgramTime"
+          type: "number"
+          description: ""
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.RemainingProgramTime"
+        }      
       ]
 
       @supportedEvents = [
@@ -92,7 +100,7 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "ConsumerProducts.CoffeeMaker.Event.DripTrayFull"
-        }
+        }    
       ] 
 
       @supportedStatus = [
@@ -167,7 +175,15 @@ module.exports = (env) ->
           unit: "°C"
           default: false
           key: "Cooking.Oven.Option.FastPreHeat"
-        }
+        },
+        {
+          name: "RemainingProgramTime"
+          type: "number"
+          description: ""
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.RemainingProgramTime"
+        }       
       ]
 
       @supportedEvents = [
@@ -178,6 +194,14 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "BSH.Common.Event.ProgramFinished"
+        },
+        {
+          name: "ProgramAborted"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramAborted"
         },
         {
           name: "AlarmClockElapsed"
@@ -194,10 +218,18 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "Cooking.Oven.Event.PreheatFinished"
-        }
+        }       
       ] 
 
       @supportedStatus = [
+        {
+          name: "ProgramProgress"
+          type: "number"
+          description: "Program progress in seconds"
+          unit: "%"
+          default: 0
+          key: "BSH.Common.Option.ProgramProgress"
+        },
         {
           name: "CurrentCavityTemperature"
           type: "number"
@@ -325,10 +357,26 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "BSH.Common.Event.ProgramFinished"
-        }
+        },
+        {
+          name: "ProgramAborted"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramAborted"
+        }        
       ]
 
       @supportedStatus = [
+        {
+          name: "ProgramProgress"
+          type: "number"
+          description: "Program progress in seconds"
+          unit: "%"
+          default: 0
+          key: "BSH.Common.Option.ProgramProgress"
+        },
         {
           name: "DoorState"
           type: "string"
@@ -392,14 +440,6 @@ module.exports = (env) ->
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
       @supportedOptions = [
         {
-          name: "RemainingProgramTime"
-          type: "number"
-          description: "RemainingProgramTime in seconds"
-          unit: "sec"
-          default: 0
-          key: "BSH.Common.Option.RemainingProgramTime"
-        },
-        {
           name: "StartInRelative"
           type: "number"
           description: "delayed start in seconds"
@@ -425,10 +465,26 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "BSH.Common.Event.ProgramFinished"
+        },
+        {
+          name: "ProgramAborted"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramAborted"
         }
       ]
 
       @supportedStatus = [
+        {
+          name: "ProgramProgress"
+          type: "number"
+          description: "Program progress in seconds"
+          unit: "%"
+          default: 0
+          key: "BSH.Common.Option.ProgramProgress"
+        },
         {
           name: "DoorState"
           type: "string"
@@ -539,6 +595,14 @@ module.exports = (env) ->
 
       @supportedStatus = [
         {
+          name: "ProgramProgress"
+          type: "number"
+          description: "Program progress in seconds"
+          unit: "%"
+          default: 0
+          key: "BSH.Common.Option.ProgramProgress"
+        },
+        {
           name: "DoorState"
           type: "string"
           description: ""
@@ -609,7 +673,15 @@ module.exports = (env) ->
           unit: "%"
           default: ""
           key: "BSH.Common.Option.ProgramProgress"
-        }        
+        },
+        {
+          name: "RemainingProgramTime"
+          type: "number"
+          description: ""
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.RemainingProgramTime"
+        }       
       ]
 
       @supportedEvents = [
@@ -620,10 +692,26 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "BSH.Common.Event.ProgramFinished"
+        },
+        {
+          name: "ProgramAborted"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramAborted"
         }
       ]
 
       @supportedStatus = [
+        {
+          name: "ProgramProgress"
+          type: "number"
+          description: "Program progress in seconds"
+          unit: "%"
+          default: 0
+          key: "BSH.Common.Option.ProgramProgress"
+        },
         {
           name: "DoorState"
           type: "string"
