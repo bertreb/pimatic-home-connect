@@ -26,5 +26,5 @@
 	* added Dryer and FridgeFreezer
 * 20200314, v0.0.18
 	* added error handling on event
-* 20200314, v0.0.19
+* 20200315, v0.0.20
 	* added appliances info

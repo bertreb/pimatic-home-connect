@@ -423,12 +423,6 @@ module.exports = (env) ->
       catch err
         env.logger.debug "Error in event handled " + evnt
 
-      if ("BSH.Common.Option.ProgramProgress").indexOf(programOrOption.key)>=0
-        resultPgrss =
-          name: "progress"
-          value: programOrOption.value + " " + programOrOption.unit
-        return resultPgrss
-
       return null
 
     execute: (device, command, options) =>
