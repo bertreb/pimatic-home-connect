@@ -203,7 +203,7 @@ module.exports = (env) ->
       @attributeValues = {}
 
       #generic attributes
-      attributesGeneric = ["program", "progress", "status"]
+      attributesGeneric = ["program", "status"]
       for _attr in attributesGeneric
         do (_attr) =>
           @attributes[_attr] =
@@ -321,9 +321,9 @@ module.exports = (env) ->
       #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
         try
-          env.logger.info "Event received =========== S T A R T ==================="
-          env.logger.info JSON.stringify(eventData,null,2)
-          env.logger.info "Event received ============= E N D ================="
+          env.logger.debug "Event received =========== S T A R T ==================="
+          env.logger.debug JSON.stringify(eventData,null,2)
+          env.logger.debug "Event received ============= E N D ================="
           if eventData.data?.items?.length?
             for d in eventData.data.items
               #env.logger.info "eventD: " + JSON.stringify(d,null,2)
@@ -413,17 +413,17 @@ module.exports = (env) ->
           if (programOrOption.value).indexOf('BSH.Common.EnumType.EventPresentState')>=0
             _state = @getLastValue(programOrOption.value)
             switch _state
-              when "present"
-                resultEvent["value"] = true
-              when "off"
-                resultEvent["value"] = false
-              when "confirmed"
-                resultEvent["value"] = false
+              when "Present"
+                resultEvnt["value"] = true
+              when "Off"
+                resultEvnt["value"] = false
+              when "Confirmed"
+                resultEvnt["value"] = false
               else
-                resultEvent["value"] = false
+                resultEvnt["value"] = false
           return resultEvnt
       catch err
-        env.logger.debug "Error in event handled " + evnt
+        env.logger.debug "Error in event handled " + err + ", event data: " + JSON.stringify(evnt,null,2)
 
       return null
 

@@ -30,3 +30,5 @@
 	* added appliances info
 * 20200315, v0.0.21
 	* added debug messages
+* 20200315, v0.1.0
+	* tested version

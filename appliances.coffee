@@ -65,15 +65,7 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "ConsumerProducts.CoffeeMaker.Option.BeanAmount"
-        },
-        {
-          name: "RemainingProgramTime"
-          type: "number"
-          description: ""
-          unit: "sec"
-          default: 0
-          key: "BSH.Common.Option.RemainingProgramTime"
-        }      
+        }    
       ]
 
       @supportedEvents = [
@@ -105,12 +97,12 @@ module.exports = (env) ->
 
       @supportedStatus = [
         {
-          name: "DoorState"
-          type: "string"
-          description: ""
-          unit: ""
-          default: "Closed"
-          key: "BSH.Common.Status.DoorState"
+          name: "ProgramProgress"
+          type: "number"
+          description: "Program progress in seconds"
+          unit: "%"
+          default: 0
+          key: "BSH.Common.Option.ProgramProgress"
         },
         {
           name: "remoteStart"
