@@ -36,9 +36,9 @@ program: <programId>, <optionname>: <optionValue>, <optionname>: <optionValue>, 
 
 Example for CoffeeMaker
 
-'''
+```
 homeconnect <CoffeeMakerId> startopts $options
-'''
+```
 Value of the variable $options is =
 ```
 program: Cappuccino, BeanAmount: DoubleShot, CoffeeTemperature: 95C, FillQuantity: 100
