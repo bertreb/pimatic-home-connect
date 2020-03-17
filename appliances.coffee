@@ -285,7 +285,15 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.RemoteControlStartAllowed"
-        }
+        },
+        {
+          name: "LocalControlActive"
+          type: "boolean"
+          description: ""
+          unit: ""
+          default: false
+          key: "BSH.Common.Status.LocalControlActive"
+        } 
       ]
 
   class Washer
@@ -408,7 +416,15 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.RemoteControlStartAllowed"
-        }
+        },
+        {
+          name: "LocalControlActive"
+          type: "boolean"
+          description: ""
+          unit: ""
+          default: false
+          key: "BSH.Common.Status.LocalControlActive"
+        } 
       ]
 
   class Dishwasher
@@ -719,7 +735,15 @@ module.exports = (env) ->
           unit: ""
           default: true
           key: "BSH.Common.Status.RemoteControlStartAllowed"
-        }
+        },
+        {
+          name: "LocalControlActive"
+          type: "boolean"
+          description: ""
+          unit: ""
+          default: false
+          key: "BSH.Common.Status.LocalControlActive"
+        } 
       ]
 
 

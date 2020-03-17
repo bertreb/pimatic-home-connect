@@ -32,5 +32,5 @@
 	* added debug messages
 * 20200315, v0.1.0
 	* fully functional status info
-* 20200315, v0.1.1
+* 20200315, v0.1.2
 	* added program and options variable in command

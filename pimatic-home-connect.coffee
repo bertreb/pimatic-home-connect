@@ -506,10 +506,10 @@ module.exports = (env) ->
               options = []
               for option in po.options
                 lastValue = @attributeValues[@getLastValue(option.key)]
-                if Number.isNaN(Number lastValue)
-                  optionValue = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
-                else
+                if _.isNumber(lastValue)
                   optionValue = Number lastValue
+                else
+                  optionValue = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
                 options.push {key: option.key, value: optionValue}
 
               @plugin.homeconnect.setActiveProgram(@haid,po.key,options)
@@ -554,10 +554,10 @@ module.exports = (env) ->
                   options.push _parameter
                 else 
                   lastValue = @attributeValues[@getLastValue(option.key)]
-                  if Number.isNaN(Number lastValue)
-                    _value = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
-                  else
+                  if _.isNumber(lastValue)
                     _value = Number lastValue
+                  else
+                    _value = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
                   options.push {key: _key, value: _value}
 
               #env.logger.info "_key: " + _key + ", options: " + JSON.stringify(options,null,2)
