@@ -43,7 +43,7 @@ module.exports = (env) ->
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
       @supportedOptions = [
         {
-          name: "Temperature"
+          name: "CoffeeTemperature"
           type: "string"
           description: ""
           unit: "C"
@@ -59,7 +59,7 @@ module.exports = (env) ->
           key: "ConsumerProducts.CoffeeMaker.Option.FillQuantity"
         },
         {
-          name: "Strength"
+          name: "BeanAmount"
           type: "string"
           description: ""
           unit: ""
@@ -105,11 +105,11 @@ module.exports = (env) ->
           key: "BSH.Common.Option.ProgramProgress"
         },
         {
-          name: "remoteStart"
-          type: "string"
+          name: "RemoteStart"
+          type: "boolean"
           description: ""
           unit: ""
-          default: "true"
+          default: true
           key: "BSH.Common.Status.RemoteControlStartAllowed"
         },
         {
@@ -119,7 +119,15 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.OperationState"
-        }
+        },
+        {
+          name: "LocalControlActive"
+          type: "boolean"
+          description: ""
+          unit: ""
+          default: false
+          key: "BSH.Common.Status.LocalControlActive"
+        }       
       ]
       
   class Oven
@@ -534,28 +542,20 @@ module.exports = (env) ->
         },
         {
           name: "SuperModeRefrigerator"
-          type: "string"
+          type: "boolean"
           description: "SuperModeRefrigerator"
           unit: ""
-          default: "false"
+          default: false
           key: "Refrigeration.FridgeFreezer.Setting.SuperModeRefrigerator"
         },     
         {
           name: "SuperModeFreezer"
-          type: "string"
+          type: "boolean"
           description: "SuperModeFreezer"
           unit: ""
-          default: "false"
+          default: false
           key: "Refrigeration.FridgeFreezer.Setting.SuperModeFreezer"
-        },    
-        {
-          name: "ProgramProgress"
-          type: "string"
-          description: "ProgramProgress in %"
-          unit: "%"
-          default: ""
-          key: "BSH.Common.Option.ProgramProgress"
-        }        
+        }       
       ]
 
       @supportedEvents = [
@@ -604,27 +604,11 @@ module.exports = (env) ->
         },
         {
           name: "RemoteControl"
-          type: "string"
+          type: "boolean"
           description: ""
           unit: ""
-          default: ""
+          default: true
           key: "BSH.Common.Status.RemoteControlActive"
-        },
-        {
-          name: "OperationState"
-          type: "string"
-          description: ""
-          unit: ""
-          default: ""
-          key: "BSH.Common.Status.OperationState"
-        },
-        {
-          name: "RemoteControlStartAllowed"
-          type: "string"
-          description: ""
-          unit: ""
-          default: ""
-          key: "BSH.Common.Status.RemoteControlStartAllowed"
         }
       ]
 
@@ -660,10 +644,10 @@ module.exports = (env) ->
         },
         {
           name: "ProgramProgress"
-          type: "string"
+          type: "number"
           description: "ProgramProgress in %"
           unit: "%"
-          default: ""
+          default: 0
           key: "BSH.Common.Option.ProgramProgress"
         },
         {
@@ -714,10 +698,10 @@ module.exports = (env) ->
         },
         {
           name: "RemoteControl"
-          type: "string"
+          type: "boolean"
           description: ""
           unit: ""
-          default: ""
+          default: true
           key: "BSH.Common.Status.RemoteControlActive"
         },
         {
@@ -730,10 +714,10 @@ module.exports = (env) ->
         },
         {
           name: "RemoteControlStartAllowed"
-          type: "string"
+          type: "boolean"
           description: ""
           unit: ""
-          default: ""
+          default: true
           key: "BSH.Common.Status.RemoteControlStartAllowed"
         }
       ]

@@ -32,14 +32,10 @@ module.exports = (env) ->
         )
         .then((savedTokens) =>
           #check if savedTokens are expired
-          #env.logger.info "savedTokens.timestamp: " + savedTokens.timestamp
-          #env.logger.info "1000*savedTokens.expires_in: " + 1000*savedTokens.expires_in
-          #env.logger.info "Date.now(): " + Date.now()
-
-          if (savedTokens.timestamp + 1000*savedTokens.expires_in) > Date.now() or not savedTokens?
+          if (savedTokens[@clientId].accessExpires) < Date.now() or not savedTokens[@clientId]?
             _savedTokens = null # token expired
           else
-            _savedTokens = savedTokens
+            _savedTokens = savedTokens[@clientId]
           #env.logger.debug "Stored tokens retrieved"  + JSON.stringify(savedTokens,null,2)
           @homeconnect = new HomeConnectAPI({
             log:        env.logger,
@@ -68,7 +64,7 @@ module.exports = (env) ->
           )
         )
 
-      @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher", "FridgeFreezer","Dryer"]
+      @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher","FridgeFreezer","Dryer"]
 
       @framework.deviceManager.registerDeviceClass('HomeconnectManager', {
         configDef: @deviceConfigDef.HomeconnectManager,
@@ -180,7 +176,8 @@ module.exports = (env) ->
       @haid = @config.haid
       #@homeconnect = @plugin.homeconnect
       @hatype = @config.hatype
-
+      @availablePrograms = []
+      @availableProgramsAndOptions = []
 
       switch @hatype
         when "CoffeeMaker"
@@ -263,7 +260,7 @@ module.exports = (env) ->
       checkConnected = () =>
         @plugin.homeconnect.getAppliance(@haid)
         .then((status) =>
-          env.logger.debug "STATUS: " + JSON.stringify(status,null,2)
+          #env.logger.debug "STATUS: " + JSON.stringify(status,null,2)
           if status.connected
             env.logger.debug "#{@hatype} #{@id} is connected "
             @setAttr("status","connected")
@@ -282,6 +279,21 @@ module.exports = (env) ->
         @checkConnectedTimer = setTimeout(checkConnected,10000)
 
     onDeviceConnected: () =>
+
+      @plugin.homeconnect.getAvailablePrograms(@haid)
+      .then((programs)=>
+        #env.logger.info "available programs: " + JSON.stringify(programs,null,2)
+        for program,i in programs
+          @availablePrograms.push program
+          @plugin.homeconnect.getAvailableProgram(@haid,program.key)
+          .then((programAndOptions)=>
+            @availableProgramsAndOptions.push programAndOptions
+          ).catch((err)=>
+            env.logger.debug "Error handled in getting available programAndOptions " + err
+          )
+      ).catch((err)=>
+        env.logger.debug "Error handled in getting available programs " + err
+      )
 
       @plugin.homeconnect.getStatus(@haid)
       .then((status)=>
@@ -389,20 +401,24 @@ module.exports = (env) ->
       if opt?
         resultOpt =
           name: opt.name
-        if opt.type is "string"
-          resultOpt["value"] = @getLastValue(programOrOption.value)
-        else
+        if opt.type is "boolean"
+          resultStat["value"] = programOrOption.value
+        else if opt.type is "number"
           resultOpt["value"] = Math.floor(Number programOrOption.value)
+        else
+          resultOpt["value"] = @getLastValue(programOrOption.value)
         return resultOpt
 
       stat = _.find(@deviceAdapter.supportedStatus, (s)=> (s.key).indexOf(programOrOption.key)>=0)
       if stat?
         resultStat =
           name: stat.name
-        if stat.type is "string"
-          resultStat["value"] = @getLastValue(programOrOption.value)
-        else
+        if stat.type is "boolean"
+          resultStat["value"] = programOrOption.value
+        else if stat.type is "number"
           resultStat["value"] = Math.floor(Number programOrOption.value)
+        else
+          resultStat["value"] = @getLastValue(programOrOption.value)
         return resultStat
 
       try
@@ -427,70 +443,156 @@ module.exports = (env) ->
 
       return null
 
-    execute: (device, command, options) =>
-      env.logger.debug "@attributes.OperationState '#{@attributeValues.OperationState}', command #{command}"
-      #env.logger.info "Execution not implemented"
-
+    parseProgramAndOptions: (_programAndOptions) =>
       #return new Promise((resolve, reject) =>
-      #  reject()
-      #)
-      return new Promise((resolve, reject) =>
-        @plugin.homeconnect.getStatusSpecific(@haid,'BSH.Common.Status.LocalControlActive')
-        .then((LocalControlActive)=>
-          if LocalControlActive 
-            env.logger.debug "Action not executed, LocalControl is active, for device #{@haid}"
-            reject()
-          return @plugin.homeconnect.getStatusSpecific(@haid,'BSH.Common.Status.RemoteControlStartAllowed')
-        ).then((RemoteControlStartAllowed)=>
-          unless RemoteControlStartAllowed 
-            env.logger.debug "RemoteControlStart not allowed for device #{@haid}"
-            reject()
-          return @plugin.homeconnect.getStatusSpecific(@haid,'BSH.Common.Status.RemoteControlActive')
-        ).then((RemoteControlActive)=>
-          unless RemoteControlActive
-            env.logger.debug "RemoteControlActive not active"
-            reject()
-        ).catch((err)=>
-          env.logger.debug "LocalControlActive status not available"
-        )
+        progAndOpts = {}
+        try
+          parameters = _programAndOptions.split(",")
+          for parameter in parameters
+            tokens = parameter.split(":")
+            par = 
+              key: (tokens[0].trimEnd()).trimStart()
+              value: (tokens[1].trimEnd()).trimStart()
+            progAndOpts[par.key] = par.value
+          
+            invalidValue = true
+            if par.key == "program"
+              if _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)
+                invalidValue = false
+            else
+              for program in @availableProgramsAndOptions
+                for option in program.options
+                  #env.logger.info "option: " + JSON.stringify(option,null,2) + ", par.value: " + par.value
+                  if option.unit is "enum"
+                    if _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)
+                      invalidValue = false
+                  if option.type is "Int"
+                    min = option.constraints.min
+                    max = option.constraints.max
+                    stepsize = option.constraints.stepsize
+                    if par.value >= min and par.value <= max and (par.value / stepsize) % 1 < 0.0001                     
+                      invalidValue = false
+            if invalidValue 
+              env.logger.debug "Invalid value #{par.value}"
+              return null
+          return progAndOpts
+        catch err
+          env.logger.debug "Handled error in parseProgramAndOptions " + err
+          return null 
+      
 
-        @plugin.homeconnect.getStatusSpecific(@haid, 'BSH.Common.Status.OperationState')
-        .then((status) =>
+    execute: (device, command, programAndOptions) =>
+      return new Promise((resolve, reject) =>
+        if @attributeValues.LocalControlActive == true
+          env.logger.debug "Action not executed, LocalControl is active, for device #{@haid}"
+          reject()
+          return
+        if @attributeValues.RemoteStart == false
+          env.logger.debug "RemoteControlStart not allowed for device #{@haid}"
+          reject()
+          return
+        
+        _programAndOptions = @parseProgramAndOptions(programAndOptions)
+        if _programAndOptions?
+          #env.logger.info "progAndOpts2 " + JSON.stringify(_programAndOptions,null,2)
           switch command
             when "start"
-              activeStates = [
-                'BSH.Common.EnumType.OperationState.Ready',
-                'BSH.Common.EnumType.OperationState.Pause'
-              ]
-              if status.value in activeStates
-                @plugin.homeconnect.getSelectedProgram(@haid)
-                .then((selected)=>
-                  #env.logger.info "Selected " + JSON.stringify(selected,null,2)
-                  return @plugin.homeconnect.setActiveProgram(@haid,selected.key)
-                )
-                .then(()=>
+              activeStates = ['Ready','Pause']
+              unless @attributeValues.OperationState in activeStates
+                env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+                reject()
+                return
+              po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(@attributeValues["program"])>=0)
+              options = []
+              for option in po.options
+                lastValue = @attributeValues[@getLastValue(option.key)]
+                if Number.isNaN(Number lastValue)
+                  optionValue = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
+                else
+                  optionValue = Number lastValue
+                options.push {key: option.key, value: optionValue}
+
+              @plugin.homeconnect.setActiveProgram(@haid,po.key,options)
+              .then(()=>
+                resolve()
+              )
+              .catch((err)=>
+                env.logger.error "Error setActiveProgram "
+                reject()
+              )
+            when "startoptions"
+              activeStates = ['Ready','Pause']
+              unless @attributeValues.OperationState in activeStates
+                #env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+                reject()
+                return
+              if _programAndOptions["program"]?
+                po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(_programAndOptions["program"])>=0)
+                if po?
+                  _key = po.key
+                else
+                  env.logger.debug "Invalid program name '#{_programAndOptions["program"]}'"
+                  reject()
+                  return
+              else
+                po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(@attributeValues["program"])>=0)
+                _key = po.key
+              options = []
+              for option in po.options
+                #env.logger.info "Po.option: " + JSON.stringify(option,null,2)
+                if _programAndOptions[@getLastValue(option.key)]?
+                  _parameter =
+                    key: option.key
+                  if option.type is "Int"
+                    _parameter["value"] = Number _programAndOptions[@getLastValue(option.key)]
+                  else 
+                    if option.type is "Boolean"
+                      _parameter["value"] = Boolean _programAndOptions[@getLastValue(option.key)]
+                    else
+                      _parameter["value"] = option.type + '.' + _programAndOptions[@getLastValue(option.key)]
+                  #env.logger.info "_parameter " + JSON.stringify(_parameter,null,2)
+                  options.push _parameter
+                else 
+                  lastValue = @attributeValues[@getLastValue(option.key)]
+                  if Number.isNaN(Number lastValue)
+                    _value = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
+                  else
+                    _value = Number lastValue
+                  options.push {key: _key, value: _value}
+
+              #env.logger.info "_key: " + _key + ", options: " + JSON.stringify(options,null,2)
+
+              if @haid? and _key? and options?
+                @plugin.homeconnect.setSelectedProgram(@haid, _key, options)
+                .then((appliances)=>
+                  @plugin.homeconnect.setActiveProgram(@haid, _key, options)
+                  .then(()=>
                     resolve()
-                )
-                .catch((err)=>
-                  env.logger.error "Error setActiveProgram "
-                )
-            when "stop"
-              activeStates = [
-                'BSH.Common.EnumType.OperationState.DelayedStart',
-                'BSH.Common.EnumType.OperationState.Run',
-                'BSH.Common.EnumType.OperationState.Pause',
-                'BSH.Common.EnumType.OperationState.ActionRequired'
-              ]
-              if status.value in activeStates
-                @plugin.homeconnect.stopActiveProgram(@haid)
-                .then(()=>
-                  resolve()
-                )
-                .catch((err)=>
-                  env.logger.error "Error stopActiveProgram"
+                  )
+                  .catch((err)=>
+                    env.logger.error "Error setActiveProgram " + err
+                    reject()
+                  )
+                ).catch((err)=>
+                  env.logger.debug "Error handled setProgram " + err
                 )
               else
+                env.logger.debug "Invalid @haid, _key or options"
                 reject()
+            when "stop"
+              activeStates = ['DelayedStart','Run','Pause','ActionRequired']
+              unless @attributeValues.OperationState in activeStates
+                env.logger.debug "Stop not allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+                reject()
+                return
+              @plugin.homeconnect.stopActiveProgram(@haid)
+              .then(()=>
+                resolve()
+              )
+              .catch((err)=>
+                env.logger.error "Error stopActiveProgram"
+                reject()
+              )
             when "pause"
               activeStates = [
                 'BSH.Common.EnumType.OperationState.Run'
@@ -519,7 +621,9 @@ module.exports = (env) ->
                 )
             else
               reject()
-        )
+        else
+          env.logger.debug "ProgramAndOptions '#{_programAndOptions}' not valid" + err
+          reject()
       )
 
     destroy:() =>
@@ -539,11 +643,20 @@ module.exports = (env) ->
       homeconnectDevices = _(@framework.deviceManager.devices).values().filter(
         (device) => device.config.class == "HomeconnectDevice"
       ).value()
-      @options = []
+
+      @program = null
+      @options = null
 
       setCommand = (command) =>
         @command = command
 
+      programOptionString = (m,tokens) =>
+        unless tokens?
+          context?.addError("No variable")
+          return
+        @programAndOptions = tokens
+        setCommand("startoptions")
+        return
 
       m = M(input, context)
         .match('homeconnect ')
@@ -560,6 +673,10 @@ module.exports = (env) ->
               setCommand('start')
               match = m.getFullMatch()
             )
+          ),
+          ((m) =>
+            return m.match(' startopts ')
+              .matchVariable(programOptionString)
           ),
           ((m) =>
             return m.match(' stop', (m) =>
@@ -587,7 +704,7 @@ module.exports = (env) ->
         return {
           token: match
           nextInput: input.substring(match.length)
-          actionHandler: new HomeconnectActionHandler(@framework, homeconnectDevice, @command, @options)
+          actionHandler: new HomeconnectActionHandler(@framework, homeconnectDevice, @command, @programAndOptions)
         }
       else
         return null
@@ -595,13 +712,17 @@ module.exports = (env) ->
 
   class HomeconnectActionHandler extends env.actions.ActionHandler
 
-    constructor: (@framework, @homeconnectDevice, @command, @options) ->
+    constructor: (@framework, @homeconnectDevice, @command, @programAndOptions) ->
 
     executeAction: (simulate) =>
       if simulate
         return __("would have cleaned \"%s\"", "")
       else
-        @homeconnectDevice.execute(@homeconnectDevice,@command, @options)
+        _var = @programAndOptions.slice(1) if @programAndOptions.indexOf('$') >= 0
+        _programAndOptions = @framework.variableManager.getVariableValue(_var)
+        unless _programAndOptions?
+          return __("\"%s\" Rule not executed, #{_var} is not a valid variable", "")        
+        @homeconnectDevice.execute(@homeconnectDevice, @command, _programAndOptions)
         .then(()=>
           return __("\"%s\" Rule executed", @command)
         ).catch((err)=>

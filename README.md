@@ -27,9 +27,22 @@ Switching from Simulator mode to Live mode is done in the plugin config. After t
 ## Actions
 Actions can be executed via rules. The rule syntax is
 ```
-homeconnect <device id or name> [start, pause, resume, stop]
+homeconnect <device id or name> [start, startopts $<programOptionsVariable>, pause, resume, stop]
 ```
 Whether an action is available, is depending on the device capabilities and the allowed control scope.
+
+The format for the $<programOptionsVariable> is:
+program: <programId>, <optionname>: <optionValue>, <optionname>: <optionValue>, ...
+
+Example for CoffeeMaker
+
+'''
+homeconnect <CoffeeMakerId> startopts $options
+'''
+Value of the variable $options is =
+```
+program: Cappuccino, BeanAmount: DoubleShot, CoffeeTemperature: 95C, FillQuantity: 100
+```
 
 For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 
