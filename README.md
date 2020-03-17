@@ -43,7 +43,7 @@ Value of the variable $options is
 ```
 program: Cappuccino, BeanAmount: DoubleShot, CoffeeTemperature: 95C, FillQuantity: 100
 ```
-The used syntax for the program name, option name and option value must be exactly as defined in the specifications ([https://developer.home-connect.com/docs/coffee-maker/supported_programs_and_options](API-DOCS)). For the name part after the last dot is used for the value its also the part after the last dots (in case of enum) or the value itself.
+The used syntax for the program name, option name and option value must be exactly as defined in the specifications [API-DOCS](https://developer.home-connect.com/docs/coffee-maker/supported_programs_and_options). For the name part after the last dot is used for the value its also the part after the last dots (in case of enum) or the value itself.
 
 For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 
