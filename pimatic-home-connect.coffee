@@ -288,6 +288,7 @@ module.exports = (env) ->
           @plugin.homeconnect.getAvailableProgram(@haid,program.key)
           .then((programAndOptions)=>
             @availableProgramsAndOptions.push programAndOptions
+            #env.logger.info "available programAndOptions: " + JSON.stringify(programAndOptions,null,2)
           ).catch((err)=>
             env.logger.debug "Error handled in getting available programAndOptions " + err
           )
@@ -456,20 +457,21 @@ module.exports = (env) ->
             progAndOpts[par.key] = par.value
           
             invalidValue = true
+            #env.logger.info "par.key: " + JSON.stringify(par.key,null,2) + ", par.value: " + par.value
             if par.key == "program"
-              if _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)
+              if _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)?
                 invalidValue = false
             else
               for program in @availableProgramsAndOptions
                 for option in program.options
                   #env.logger.info "option: " + JSON.stringify(option,null,2) + ", par.value: " + par.value
                   if option.unit is "enum"
-                    if _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)
+                    if _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)?
                       invalidValue = false
                   if option.type is "Int"
                     min = option.constraints.min
                     max = option.constraints.max
-                    stepsize = option.constraints.stepsize
+                    stepsize = if option.constraints.stepsize? then option.constraints.stepsize else 1
                     if par.value >= min and par.value <= max and (par.value / stepsize) % 1 < 0.0001                     
                       invalidValue = false
             if invalidValue 
@@ -537,6 +539,7 @@ module.exports = (env) ->
               else
                 po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(@attributeValues["program"])>=0)
                 _key = po.key
+
               options = []
               for option in po.options
                 #env.logger.info "Po.option: " + JSON.stringify(option,null,2)
@@ -558,7 +561,7 @@ module.exports = (env) ->
                     _value = Number lastValue
                   else
                     _value = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
-                  options.push {key: _key, value: _value}
+                  options.push {key: option.key, value: _value}
 
               #env.logger.info "_key: " + _key + ", options: " + JSON.stringify(options,null,2)
 
