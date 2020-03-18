@@ -456,12 +456,68 @@ module.exports = (env) ->
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
       @supportedOptions = [
         {
-          name: "StartInRelative"
+          name: "Duration"
           type: "number"
-          description: "delayed start in seconds"
+          description: "Duration in seconds"
           unit: "sec"
-          default: 0
-          key: "BSH.Common.Option.StartInRelative"
+          default: 30
+          key: "BSH.Common.Option.Duration"
+        },
+        {
+          name: "Lighting"
+          type: "boolean"
+          description: "Lighting"
+          unit: ""
+          default: false
+          key: "Cooking.Common.Setting.Lighting"
+        },
+        {
+          name: "Lighting"
+          type: "boolean"
+          description: "Lighting"
+          unit: ""
+          default: false
+          key: "Cooking.Common.Setting.Lighting"
+        },
+        {
+          name: "LightingBrightness"
+          type: "number"
+          description: "LightingBrightness"
+          unit: ""
+          default: 10
+          key: "Cooking.Common.Setting.LightingBrightness"
+        },
+        {
+          name: "AmbientLightEnabled"
+          type: "boolean"
+          description: "AmbientLightEnabled"
+          unit: ""
+          default: false
+          key: "BSH.Common.Setting.AmbientLightEnabled"
+        },
+        {
+          name: "AmbientLightBrightness"
+          type: "number"
+          description: "AmbientLightBrightness"
+          unit: ""
+          default: 10
+          key: "BSH.Common.Setting.AmbientLightBrightness"
+        },
+        {
+          name: "AmbientLightColor"
+          type: "boolean"
+          description: "AmbientLightColor"
+          unit: ""
+          default: ""
+          key: "BSH.Common.Setting.AmbientLightColor"
+        },
+        {
+          name: "AmbientLightCustomColor"
+          type: "string"
+          description: "AmbientLightCustomColor"
+          unit: ""
+          default: ""
+          key: "BSH.Common.Setting.AmbientLightCustomColor"
         }
       ]
 
@@ -481,14 +537,6 @@ module.exports = (env) ->
           unit: ""
           default: "false"
           key: "BSH.Common.Event.ProgramFinished"
-        },
-        {
-          name: "ProgramAborted"
-          type: "string"
-          description: ""
-          unit: ""
-          default: "false"
-          key: "BSH.Common.Event.ProgramAborted"
         }
       ]
 
@@ -746,6 +794,158 @@ module.exports = (env) ->
         } 
       ]
 
+  class Hood
+    constructor: () ->
+      @programs = [
+        {name: "Cooking.Common.Program.Hood.Automatic"},
+        {name: "Cooking.Common.Program.Hood.Venting"},
+        {name: "Cooking.Common.Program.Hood.DelayedShutOff "}
+      ]
+      @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @supportedOptions = [
+        {
+          name: "VentingLevel"
+          type: "string"
+          description: "VentingLevel"
+          unit: ""
+          default: ""
+          key: "Cooking.Common.Option.Hood.VentingLevel"
+        },
+        {
+          name: "IntensiveLevel"
+          type: "string"
+          description: "IntensiveLevel"
+          unit: ""
+          default: ""
+          key: "Cooking.Common.Option.Hood.IntensiveLevel"
+        },
+        {
+          name: "Lighting"
+          type: "boolean"
+          description: "Lighting"
+          unit: ""
+          default: false
+          key: "Cooking.Common.Setting.Lighting"
+        },
+        {
+          name: "Lighting"
+          type: "boolean"
+          description: "Lighting"
+          unit: ""
+          default: false
+          key: "Cooking.Common.Setting.Lighting"
+        },
+        {
+          name: "LightingBrightness"
+          type: "number"
+          description: "LightingBrightness"
+          unit: ""
+          default: 10
+          key: "Cooking.Common.Setting.LightingBrightness"
+        },
+        {
+          name: "AmbientLightEnabled"
+          type: "boolean"
+          description: "AmbientLightEnabled"
+          unit: ""
+          default: false
+          key: "BSH.Common.Setting.AmbientLightEnabled"
+        },
+        {
+          name: "AmbientLightBrightness"
+          type: "number"
+          description: "AmbientLightBrightness"
+          unit: ""
+          default: 10
+          key: "BSH.Common.Setting.AmbientLightBrightness"
+        },
+        {
+          name: "AmbientLightColor"
+          type: "boolean"
+          description: "AmbientLightColor"
+          unit: ""
+          default: ""
+          key: "BSH.Common.Setting.AmbientLightColor"
+        },
+        {
+          name: "AmbientLightCustomColor"
+          type: "string"
+          description: "AmbientLightCustomColor"
+          unit: ""
+          default: ""
+          key: "BSH.Common.Setting.AmbientLightCustomColor"
+        }
+      ]
+
+      @supportedEvents = [
+        {
+          name: "ProgramFinished"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramFinished"
+        },
+        {
+          name: "ProgramAborted"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramAborted"
+        }
+      ]
+
+      @supportedStatus = [
+        {
+          name: "ProgramProgress"
+          type: "number"
+          description: "Program progress in seconds"
+          unit: "%"
+          default: 0
+          key: "BSH.Common.Option.ProgramProgress"
+        },
+        {
+          name: "ElapsedProgramTime"
+          type: "number"
+          description: ""
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.ElapsedProgramTime"
+        },
+        {
+          name: "RemoteControl"
+          type: "boolean"
+          description: ""
+          unit: ""
+          default: true
+          key: "BSH.Common.Status.RemoteControlActive"
+        },
+        {
+          name: "OperationState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.OperationState"
+        },
+        {
+          name: "RemoteControlStartAllowed"
+          type: "boolean"
+          description: ""
+          unit: ""
+          default: true
+          key: "BSH.Common.Status.RemoteControlStartAllowed"
+        },
+        {
+          name: "LocalControlActive"
+          type: "boolean"
+          description: ""
+          unit: ""
+          default: false
+          key: "BSH.Common.Status.LocalControlActive"
+        } 
+      ]
 
   return exports = {
     CoffeeMaker
@@ -754,4 +954,5 @@ module.exports = (env) ->
     Dishwasher
     Dryer
     FridgeFreezer
+    Hood
   }

@@ -34,5 +34,6 @@
 	* fully functional status info
 * 20200317, v0.1.3
 	* added program and options variable in command
-* 20200318, v0.1.4
+* 20200318, v0.1.5
 	* added descriptions of programs and options
+	* small fix

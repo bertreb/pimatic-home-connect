@@ -174,9 +174,7 @@ module.exports = (env) ->
 
       @name = @config.name
       @haid = @config.haid
-      #@homeconnect = @plugin.homeconnect
       @hatype = @config.hatype
-      @availablePrograms = []
       @availableProgramsAndOptions = []
 
       switch @hatype
@@ -192,6 +190,8 @@ module.exports = (env) ->
           @deviceAdapter = new Appliances.FridgeFreezer()
         when "Dryer"
           @deviceAdapter = new Appliances.Dryer()
+        when "Hood"
+          @deviceAdapter = new Appliances.Hood()
         else
           env.logger.debug "Device type #{@hatype} not yet supported"
           return
@@ -256,6 +256,32 @@ module.exports = (env) ->
 
       super()
 
+    ###
+    setAttributesVisibility: () =>
+      #env.logger.info "Attributes: " + JSON.stringify(@attributes,null,2)
+      @framework.variableManager.waitForInit()
+      .then(()=>
+        for i, attr of @attributes
+          env.logger.info "Attribute " + JSON.stringify(i,null,2)
+          unless i is "status" or i is "program"
+            _hidden = true
+            for program in @availableProgramsAndOptions
+              env.logger.info "program: " + JSON.stringify(program,null,2) + ", i: " + i
+              if (program.key).indexOf(i)>=0
+                env.logger.info "Attribute #{i} is visible"
+                _hidden = false
+              else
+                env.logger.info "Attribute #{i} is hidden"
+              for option in program.options
+                if (option.key).indexOf(i)>=0
+                  env.logger.info "Attribute #{i} is visible"
+                  _hidden = false
+                else
+                  env.logger.info "Attribute #{i} is hidden"
+            @attributes[i]["hidden"] = _hidden
+      )
+    ###
+  
     onConnectDevice: () =>
       checkConnected = () =>
         @plugin.homeconnect.getAppliance(@haid)
@@ -282,13 +308,14 @@ module.exports = (env) ->
 
       @plugin.homeconnect.getAvailablePrograms(@haid)
       .then((programs)=>
-        #env.logger.info "available programs: " + JSON.stringify(programs,null,2)
-        for program,i in programs
-          @availablePrograms.push program
+        #env.logger.info "available programs: #{_.size(programs)} " + JSON.stringify(programs,null,2)
+        for program, i in programs
           @plugin.homeconnect.getAvailableProgram(@haid,program.key)
           .then((programAndOptions)=>
             @availableProgramsAndOptions.push programAndOptions
-            #env.logger.info "available programAndOptions: " + JSON.stringify(programAndOptions,null,2)
+            if _.size(@availableProgramsAndOptions) is _.size(programs)
+              env.logger.debug "AvailableProgramsAndOptions is ready"
+              #@setAttributesVisibility()
           ).catch((err)=>
             env.logger.debug "Error handled in getting available programAndOptions " + err
           )
@@ -300,7 +327,7 @@ module.exports = (env) ->
       .then((status)=>
         for i,s of status
           #env.logger.info "Status:::::: " + JSON.stringify(s,null,2)
-          @setProgramOrOption(s)
+          @setProgramOrOption(s) if s?
       ).catch((err)=>
         env.logger.debug "Error handled in startup getStatus " + err
       )
@@ -326,12 +353,13 @@ module.exports = (env) ->
       .then((settings)=>
         for i,s of settings
           #env.logger.info "Settings:::::: " + JSON.stringify(s,null,2)
-          @setProgramOrOption(s)
+          @setProgramOrOption(s) if s?
       )
       .catch((err)=>
         env.logger.debug "Error handled in startup getSettings " + err
       )
-      #env.logger.info "Listening at events from #{@haid}"
+
+      env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
         try
           env.logger.debug "Event received =========== S T A R T ==================="
@@ -403,7 +431,7 @@ module.exports = (env) ->
         resultOpt =
           name: opt.name
         if opt.type is "boolean"
-          resultStat["value"] = programOrOption.value
+          resultOpt["value"] = programOrOption.value
         else if opt.type is "number"
           resultOpt["value"] = Math.floor(Number programOrOption.value)
         else
