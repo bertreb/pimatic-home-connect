@@ -43,7 +43,7 @@ Value of the variable $options is
 ```
 program: Cappuccino, BeanAmount: DoubleShot, CoffeeTemperature: 95C, FillQuantity: 100
 ```
-The used syntax for the program name, option name and option value must be exactly as defined in the api documentation. For example the CoffeeMaker [API-DOCS](https://developer.home-connect.com/docs/coffee-maker/supported_programs_and_options). For the name part after the last dot is used for the value its also the part after the last dots (in case of enum) or the value itself.
+The used syntax for the program name, option name and option value must be exactly as defined in the api documentation. See the Programs and options for syntax definitions. For an example see the CoffeeMaker [API-DOCS](https://developer.home-connect.com/docs/coffee-maker/supported_programs_and_options). For the name part after the last dot is used for the value its also the part after the last dots (in case of enum) or the value itself.
 
 For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 
@@ -59,6 +59,47 @@ The following program and options settings are the maximum available for a devic
 **CoffeeTemperature**: 88C, 90C, 92C, 94C, 95C, 96C
 
 **FillQuantity**: 60 - 260 with stepsize 20
+
+### Washer
+**Programs**: Cotton, EasyCare, Mix, DelicatesSilk, Wool, Sensitive, Auto30, Auto40, Auto60, Chiffon, Curtains, DarkWash, Dessous, Monsoon, Outdoor, PlushToy, ShirtsBlouses, Outdoor, SportFitness, Towels, WaterProof
+
+**Temperature**: Cold, GC20, GC30, GC40, GC50, GC60, GC70, GC80, GC90
+   
+**Spinspeed**: RPM400, RPM600, RPM800, RPM1000, RPM1200, RPM1400
+
+### DishWasher
+**Programs**: Auto1, Auto2, Auto3, Eco50, Quick45, Intensiv70, Normal65, Glas40, GlassCare, NightWash, Quick65, Normal45, Intensiv45, AutoHalfLoad, IntensivPower, MagicDaily, Super60, Kurz60, ExpressSparkle65, MachineCare, SteamFresh, MaximumCleaning
+
+**StartInRelative**: 1 - 86340 (in seconds)
+
+### Oven
+**Programs**: PreHeating, HotAir, TopBottomHeating, PizzaSetting, HotAirEco, HotAirGrilling, TopBottomHeatingEco, BottomHeating, SlowCook, IntensiveHeat, KeepWarm, PreheatOvenware, FrozenHeatupSpecial, Desiccation, Defrost, Proof
+
+**SetpointTemperature**: 30 - 275 (in °C)
+
+**Duration**, 1 - 86340 (in seconds)
+
+**FastPreHeat**: false or true
+
+**StartInRelative**: 1 - 86340 (in seconds)
+
+### Dryer
+**Programs**: Cotton, Synthetic, Mix, Blankets, BusinessShirts, DownFeathers, Hygiene, Program.Jeans, Outdoor, SyntheticRefresh, Towels, Delicates, Super40, Shirts15, Pillow, AntiShrink
+
+**DryingTarget**: IronDry, CupboardDry, CupboardDryPlus
+
+### FridgeFreezer
+**Programs**: none
+
+**SetpointTemperatureRefrigerator**: 2 to 8 (in °C)
+
+**SetpointTemperatureFreezer**: -24 to -16 (in °C)
+
+**SuperModeRefrigerator**: false or true
+
+**SuperModeFreezer**: false or true
+
+**EcoMode**: false or true
 
 ---
 **The minimum requirement for this plugin is node v8!**
