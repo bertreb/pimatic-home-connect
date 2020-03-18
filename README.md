@@ -52,13 +52,13 @@ The following program and options settings are the maximum available for a devic
 ### Coffeemaker
 ++Programs++: Espresso, EspressoMacchiato, Coffee, Cappuccino, LatteMacchiato, CaffeLatte, Americano, EspressoDoppio, FlatWhite, Galao, MilkFroth, WarmMilk, Ristretto, Cortado, KleinerBrauner, GrosserBrauner, Verlaengerter, VerlaengerterBraun, WienerMelange, FlatWhite, Cortado, CafeCortado, CafeConLeche, CafeAuLait, Doppio, Kaapi, KoffieVerkeerd, Galao, Garoto, Americano, RedEye, BlackEye, DeadEye
 
-++BeanAmount++: VeryMild, Mild, MildPlus, Normal, NormalPlus, Strong, StrongPlus, VeryStrong, VeryStrongPlus, ExtraStrong, DoubleShot
+__BeanAmount__: VeryMild, Mild, MildPlus, Normal, NormalPlus, Strong, StrongPlus, VeryStrong, VeryStrongPlus, ExtraStrong, DoubleShot
 
-++DoubleShotPlus++, DoubleShotPlusPlus, CoffeeGround
+__DoubleShotPlus__, DoubleShotPlusPlus, CoffeeGround
 
-++CoffeeTemperature++: 88C, 90C, 92C, 94C, 95C, 96C
+__CoffeeTemperature__: 88C, 90C, 92C, 94C, 95C, 96C
 
-++FillQuantity++: 60 - 260 with stepsize 20
+__FillQuantity__: 60 - 260 with stepsize 20
 
 ### Washer
 **Programs**: Cotton, EasyCare, Mix, DelicatesSilk, Wool, Sensitive, Auto30, Auto40, Auto60, Chiffon, Curtains, DarkWash, Dessous, Monsoon, Outdoor, PlushToy, ShirtsBlouses, Outdoor, SportFitness, Towels, WaterProof
