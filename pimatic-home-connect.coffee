@@ -359,7 +359,7 @@ module.exports = (env) ->
         env.logger.debug "Error handled in startup getSettings " + err
       )
 
-      env.logger.info "Listening at events from #{@haid}"
+      #env.logger.info "Listening at events from #{@haid}"
       @plugin.homeconnect.on @haid, (eventData) =>
         try
           env.logger.debug "Event received =========== S T A R T ==================="
