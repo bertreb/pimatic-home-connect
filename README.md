@@ -49,11 +49,15 @@ For the interface with the Home-Connect api the homeconnect_api.js is used. This
 
 # Programs and options
 The following program and options settings are the maximum available for a device. A secific type / brand of a device will use this values or a subset.
-### Coffeemaker programs and options
-**Programs**: Espresso, EspressoMacchiato, Coffee, Cappuccino, LatteMacchiato, CaffeLatte, Americano, EspressoDoppio, FlatWhite, Galao, MilkFroth, WarmMilk, Ristretto, Cortado, KleinerBrauner, GrosserBrauner, Verlaengerter, VerlaengerterBraun, WienerMelange, FlatWhite, Cortado, CafeCortado, CafeConLeche, CafeAuLait, Doppio, Kaapi, KoffieVerkeerd, Galao, Garoto, Americano, RedEye, BlackEye, DeadEye
+### Coffeemaker
+**Programs**Espresso, EspressoMacchiato, Coffee, Cappuccino, LatteMacchiato, CaffeLatte, Americano, EspressoDoppio, FlatWhite, Galao, MilkFroth, WarmMilk, Ristretto, Cortado, KleinerBrauner, GrosserBrauner, Verlaengerter, VerlaengerterBraun, WienerMelange, FlatWhite, Cortado, CafeCortado, CafeConLeche, CafeAuLait, Doppio, Kaapi, KoffieVerkeerd, Galao, Garoto, Americano, RedEye, BlackEye, DeadEye
 
-**BeanAmount**: VeryMild, Mild, MildPlus, Normal, NormalPlus, Strong, StrongPlus, VeryStrong, VeryStrongPlus, ExtraStrong, DoubleShot, **DoubleShotPlus**, DoubleShotPlusPlus, CoffeeGround
+**BeanAmount**: VeryMild, Mild, MildPlus, Normal, NormalPlus, Strong, StrongPlus, VeryStrong, VeryStrongPlus, ExtraStrong, DoubleShot
+
+**DoubleShotPlus**, DoubleShotPlusPlus, CoffeeGround
+
 **CoffeeTemperature**: 88C, 90C, 92C, 94C, 95C, 96C
+
 **FillQuantity**: 60 - 260 with stepsize 20
 ---
 **The minimum requirement for this plugin is node v8!**
