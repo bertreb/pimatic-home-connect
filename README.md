@@ -48,7 +48,7 @@ The used syntax for the program name, option name and option value must be exact
 For the interface with the Home-Connect api the homeconnect_api.js is used. This lib is written by Alexander Thoukydides.
 
 # Programs and options
-The following program and options settings are the maximum available for a device. A specific type / brand of a device will probably use a subset of these values. See your device manual to check what is available on your device.
+The following program and options settings are the maximum available for a device. A specific type / brand of a device will probably use a subset of these values. See your device manual to check what is available for your device.
 ### Coffeemaker
 ___Programs___: Espresso, EspressoMacchiato, Coffee, Cappuccino, LatteMacchiato, CaffeLatte, Americano, EspressoDoppio, FlatWhite, Galao, MilkFroth, WarmMilk, Ristretto, Cortado, KleinerBrauner, GrosserBrauner, Verlaengerter, VerlaengerterBraun, WienerMelange, FlatWhite, Cortado, CafeCortado, CafeConLeche, CafeAuLait, Doppio, Kaapi, KoffieVerkeerd, Galao, Garoto, Americano, RedEye, BlackEye, DeadEye
 
@@ -64,7 +64,7 @@ ___FillQuantity___: 60 - 260 with stepsize 20
 ___Programs___: Cotton, EasyCare, Mix, DelicatesSilk, Wool, Sensitive, Auto30, Auto40, Auto60, Chiffon, Curtains, DarkWash, Dessous, Monsoon, Outdoor, PlushToy, ShirtsBlouses, Outdoor, SportFitness, Towels, WaterProof
 
 ___Temperature___: Cold, GC20, GC30, GC40, GC50, GC60, GC70, GC80, GC90
-   
+
 ___Spinspeed___: RPM400, RPM600, RPM800, RPM1000, RPM1200, RPM1400
 
 ### DishWasher
