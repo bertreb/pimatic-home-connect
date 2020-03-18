@@ -631,22 +631,22 @@ module.exports = (env) ->
   class Dryer
     constructor: () ->
       @programs = [
-        {name: "LaundryCare.Washer.Program.Cotton"},
+        {name: "LaundryCare.Dryer.Program.Cotton"},
         {name: "LaundryCare.Dryer.Program.Synthetic"},
-        {name: "LaundryCare.Washer.Program.Mix"},
-        {name: "LaundryCare.Washer.Program.Blankets"},
-        {name: "LaundryCare.Washer.Program.BusinessShirts"},
-        {name: "LaundryCare.Washer.Program.DownFeathers"},
-        {name: "LaundryCare.Washer.Program.Hygiene"},
-        {name: "LaundryCare.Washer.Program.Program.Jeans"},
-        {name: "LaundryCare.Washer.Program.Outdoor"},       
-        {name: "LaundryCare.Washer.Program.SyntheticRefresh"},       
-        {name: "LaundryCare.Washer.Program.Towels"},       
-        {name: "LaundryCare.Washer.Program.Delicates"},       
-        {name: "LaundryCare.Washer.Program.Super40"},        
-        {name: "LaundryCare.Washer.Program.Shirts15"},        
-        {name: "LaundryCare.Washer.Program.Pillow"},        
-        {name: "LaundryCare.Washer.Program.AntiShrink"}     
+        {name: "LaundryCare.Dryer.Program.Mix"},
+        {name: "LaundryCare.Dryer.Program.Blankets"},
+        {name: "LaundryCare.Dryer.Program.BusinessShirts"},
+        {name: "LaundryCare.Dryer.Program.DownFeathers"},
+        {name: "LaundryCare.Dryer.Program.Hygiene"},
+        {name: "LaundryCare.Dryer.Program.Program.Jeans"},
+        {name: "LaundryCare.Dryer.Program.Outdoor"},       
+        {name: "LaundryCare.Dryer.Program.SyntheticRefresh"},       
+        {name: "LaundryCare.Dryer.Program.Towels"},       
+        {name: "LaundryCare.Dryer.Program.Delicates"},       
+        {name: "LaundryCare.Dryer.Program.Super40"},        
+        {name: "LaundryCare.Dryer.Program.Shirts15"},        
+        {name: "LaundryCare.Dryer.Program.Pillow"},        
+        {name: "LaundryCare.Dryer.Program.AntiShrink"}     
       ]
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
       @supportedOptions = [
