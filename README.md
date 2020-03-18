@@ -50,15 +50,15 @@ For the interface with the Home-Connect api the homeconnect_api.js is used. This
 # Programs and options
 The following program and options settings are the maximum available for a device. A specific type / brand of a device will probably use a subset of these values. See your device manual to check what is available on your device.
 ### Coffeemaker
-**Programs**: Espresso, EspressoMacchiato, Coffee, Cappuccino, LatteMacchiato, CaffeLatte, Americano, EspressoDoppio, FlatWhite, Galao, MilkFroth, WarmMilk, Ristretto, Cortado, KleinerBrauner, GrosserBrauner, Verlaengerter, VerlaengerterBraun, WienerMelange, FlatWhite, Cortado, CafeCortado, CafeConLeche, CafeAuLait, Doppio, Kaapi, KoffieVerkeerd, Galao, Garoto, Americano, RedEye, BlackEye, DeadEye
+++Programs++: Espresso, EspressoMacchiato, Coffee, Cappuccino, LatteMacchiato, CaffeLatte, Americano, EspressoDoppio, FlatWhite, Galao, MilkFroth, WarmMilk, Ristretto, Cortado, KleinerBrauner, GrosserBrauner, Verlaengerter, VerlaengerterBraun, WienerMelange, FlatWhite, Cortado, CafeCortado, CafeConLeche, CafeAuLait, Doppio, Kaapi, KoffieVerkeerd, Galao, Garoto, Americano, RedEye, BlackEye, DeadEye
 
-**BeanAmount**: VeryMild, Mild, MildPlus, Normal, NormalPlus, Strong, StrongPlus, VeryStrong, VeryStrongPlus, ExtraStrong, DoubleShot
+++BeanAmount++: VeryMild, Mild, MildPlus, Normal, NormalPlus, Strong, StrongPlus, VeryStrong, VeryStrongPlus, ExtraStrong, DoubleShot
 
-**DoubleShotPlus**, DoubleShotPlusPlus, CoffeeGround
+++DoubleShotPlus++, DoubleShotPlusPlus, CoffeeGround
 
-**CoffeeTemperature**: 88C, 90C, 92C, 94C, 95C, 96C
+++CoffeeTemperature++: 88C, 90C, 92C, 94C, 95C, 96C
 
-**FillQuantity**: 60 - 260 with stepsize 20
+++FillQuantity++: 60 - 260 with stepsize 20
 
 ### Washer
 **Programs**: Cotton, EasyCare, Mix, DelicatesSilk, Wool, Sensitive, Auto30, Auto40, Auto60, Chiffon, Curtains, DarkWash, Dessous, Monsoon, Outdoor, PlushToy, ShirtsBlouses, Outdoor, SportFitness, Towels, WaterProof
