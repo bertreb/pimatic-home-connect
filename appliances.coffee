@@ -464,12 +464,12 @@ module.exports = (env) ->
           key: "BSH.Common.Option.Duration"
         },
         {
-          name: "Lighting"
-          type: "boolean"
-          description: "Lighting"
+          name: "StartInRelative"
+          type: "number"
+          description: "StartInRelative"
           unit: ""
-          default: false
-          key: "Cooking.Common.Setting.Lighting"
+          default: 0
+          key: "BSH.Common.Option.StartInRelative"
         },
         {
           name: "Lighting"

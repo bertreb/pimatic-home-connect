@@ -591,7 +591,7 @@ module.exports = (env) ->
                     _value = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
                   options.push {key: option.key, value: _value}
 
-              #env.logger.info "_key: " + _key + ", options: " + JSON.stringify(options,null,2)
+              env.logger.info "_key: " + _key + ", options: " + JSON.stringify(options,null,2)
 
               if @haid? and _key? and options?
                 @plugin.homeconnect.setSelectedProgram(@haid, _key, options)
