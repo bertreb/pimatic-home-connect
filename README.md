@@ -59,5 +59,6 @@ The following program and options settings are the maximum available for a devic
 **CoffeeTemperature**: 88C, 90C, 92C, 94C, 95C, 96C
 
 **FillQuantity**: 60 - 260 with stepsize 20
+
 ---
 **The minimum requirement for this plugin is node v8!**
