@@ -200,7 +200,7 @@ module.exports = (env) ->
       @attributeValues = {}
 
       #generic attributes
-      attributesGeneric = ["program", "status"]
+      attributesGeneric = [ "status", "program"]
       for _attr in attributesGeneric
         do (_attr) =>
           @attributes[_attr] =
@@ -213,7 +213,7 @@ module.exports = (env) ->
             return Promise.resolve @attributeValues[_attr]
           )
 
-      if @plugin.simulation and not @config.simulated 
+      if @plugin.simulation and not @config.simulated
         env.logger.debug "Live device '#{@id}'' not started because of simulation mode"
         @setAttr("status", 'offline')
         return
@@ -451,11 +451,11 @@ module.exports = (env) ->
           parameters = _programAndOptions.split(",")
           for parameter in parameters
             tokens = parameter.split(":")
-            par = 
+            par =
               key: (tokens[0].trimEnd()).trimStart()
               value: (tokens[1].trimEnd()).trimStart()
             progAndOpts[par.key] = par.value
-          
+
             invalidValue = true
             #env.logger.info "par.key: " + JSON.stringify(par.key,null,2) + ", par.value: " + par.value
             if par.key == "program"
@@ -472,16 +472,16 @@ module.exports = (env) ->
                     min = option.constraints.min
                     max = option.constraints.max
                     stepsize = if option.constraints.stepsize? then option.constraints.stepsize else 1
-                    if par.value >= min and par.value <= max and (par.value / stepsize) % 1 < 0.0001                     
+                    if par.value >= min and par.value <= max and (par.value / stepsize) % 1 < 0.0001
                       invalidValue = false
-            if invalidValue 
+            if invalidValue
               env.logger.debug "Invalid value #{par.value}"
               return null
           return progAndOpts
         catch err
           env.logger.debug "Handled error in parseProgramAndOptions " + err
-          return null 
-      
+          return null
+
 
     execute: (device, command, programAndOptions) =>
       return new Promise((resolve, reject) =>
@@ -493,7 +493,7 @@ module.exports = (env) ->
           env.logger.debug "RemoteControlStart not allowed for device #{@haid}"
           reject()
           return
-        
+
         _programAndOptions = @parseProgramAndOptions(programAndOptions)
         if _programAndOptions?
           #env.logger.info "progAndOpts2 " + JSON.stringify(_programAndOptions,null,2)
@@ -548,14 +548,14 @@ module.exports = (env) ->
                     key: option.key
                   if option.type is "Int"
                     _parameter["value"] = Number _programAndOptions[@getLastValue(option.key)]
-                  else 
+                  else
                     if option.type is "Boolean"
                       _parameter["value"] = Boolean _programAndOptions[@getLastValue(option.key)]
                     else
                       _parameter["value"] = option.type + '.' + _programAndOptions[@getLastValue(option.key)]
                   #env.logger.info "_parameter " + JSON.stringify(_parameter,null,2)
                   options.push _parameter
-                else 
+                else
                   lastValue = @attributeValues[@getLastValue(option.key)]
                   if _.isNumber(lastValue)
                     _value = Number lastValue
@@ -724,7 +724,7 @@ module.exports = (env) ->
         _var = @programAndOptions.slice(1) if @programAndOptions.indexOf('$') >= 0
         _programAndOptions = @framework.variableManager.getVariableValue(_var)
         unless _programAndOptions?
-          return __("\"%s\" Rule not executed, #{_var} is not a valid variable", "")        
+          return __("\"%s\" Rule not executed, #{_var} is not a valid variable", "")
         @homeconnectDevice.execute(@homeconnectDevice, @command, _programAndOptions)
         .then(()=>
           return __("\"%s\" Rule executed", @command)
