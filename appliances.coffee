@@ -456,12 +456,12 @@ module.exports = (env) ->
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
       @supportedOptions = [
         {
-          name: "Duration"
+          name: "RemainingProgramTime"
           type: "number"
-          description: "Duration in seconds"
+          description: ""
           unit: "sec"
-          default: 30
-          key: "BSH.Common.Option.Duration"
+          default: 0
+          key: "BSH.Common.Option.RemainingProgramTime"
         },
         {
           name: "StartInRelative"
@@ -803,6 +803,14 @@ module.exports = (env) ->
       ]
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
       @supportedOptions = [
+        {
+          name: "Duration"
+          type: "number"
+          description: "Duration in seconds"
+          unit: "sec"
+          default: 30
+          key: "BSH.Common.Option.Duration"
+        },
         {
           name: "VentingLevel"
           type: "string"
