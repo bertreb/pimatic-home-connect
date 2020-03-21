@@ -489,14 +489,14 @@ module.exports = (env) ->
             progAndOpts[par.key] = par.value
 
             invalidValue = true
-            #env.logger.info "par.key: " + JSON.stringify(par.key,null,2) + ", par.value: " + par.value
+            env.logger.info "par.key: " + JSON.stringify(par.key,null,2) + ", par.value: " + par.value
             if par.key == "program"
               if _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)?
                 invalidValue = false
             else
               for program in @availableProgramsAndOptions
                 for option in program.options
-                  #env.logger.info "option: " + JSON.stringify(option,null,2) + ", par.value: " + par.value
+                  env.logger.info "option: " + JSON.stringify(option,null,2) + ", par.value: " + par.value
                   if option.unit is "enum"
                     if _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)?
                       invalidValue = false
@@ -526,145 +526,145 @@ module.exports = (env) ->
           reject()
           return
 
-        _programAndOptions = @parseProgramAndOptions(programAndOptions)
-        if _programAndOptions?
-          #env.logger.info "progAndOpts2 " + JSON.stringify(_programAndOptions,null,2)
-          switch command
-            when "start"
-              activeStates = ['Ready','Pause']
-              unless @attributeValues.OperationState in activeStates
-                env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+        if not @parseProgramAndOptions(programAndOptions)? and programAndOptions?
+          env.logger.debug "ProgramAndOptions '#{programAndOptions}' not valid" + err
+          reject()
+          return
+
+        #env.logger.info "progAndOpts2 " + JSON.stringify(_programAndOptions,null,2)
+        switch command
+          when "start"
+            activeStates = ['Ready','Pause']
+            unless @attributeValues.OperationState in activeStates
+              env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+              reject()
+              return
+            po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(@attributeValues["program"])>=0)
+            options = []
+            for option in po.options
+              lastValue = @attributeValues[@getLastValue(option.key)]
+              if _.isNumber(lastValue)
+                optionValue = Number lastValue
+              else
+                optionValue = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
+              options.push {key: option.key, value: optionValue}
+
+            @plugin.homeconnect.setActiveProgram(@haid,po.key,options)
+            .then(()=>
+              resolve()
+            )
+            .catch((err)=>
+              env.logger.error "Error setActiveProgram "
+              reject()
+            )
+          when "startoptions"
+            activeStates = ['Ready','Pause']
+            unless @attributeValues.OperationState in activeStates
+              #env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+              reject()
+              return
+            if _programAndOptions["program"]?
+              po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(_programAndOptions["program"])>=0)
+              if po?
+                _key = po.key
+              else
+                env.logger.debug "Invalid program name '#{_programAndOptions["program"]}'"
                 reject()
                 return
+            else
               po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(@attributeValues["program"])>=0)
-              options = []
-              for option in po.options
+              _key = po.key
+
+            options = []
+            for option in po.options
+              #env.logger.info "Po.option: " + JSON.stringify(option,null,2)
+              if _programAndOptions[@getLastValue(option.key)]?
+                _parameter =
+                  key: option.key
+                if option.type is "Int"
+                  _parameter["value"] = Number _programAndOptions[@getLastValue(option.key)]
+                else
+                  if option.type is "Boolean"
+                    _parameter["value"] = Boolean _programAndOptions[@getLastValue(option.key)]
+                  else
+                    _parameter["value"] = option.type + '.' + _programAndOptions[@getLastValue(option.key)]
+                #env.logger.info "_parameter " + JSON.stringify(_parameter,null,2)
+                options.push _parameter
+              else
                 lastValue = @attributeValues[@getLastValue(option.key)]
                 if _.isNumber(lastValue)
-                  optionValue = Number lastValue
+                  _value = Number lastValue
                 else
-                  optionValue = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
-                options.push {key: option.key, value: optionValue}
+                  _value = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
+                options.push {key: option.key, value: _value}
 
-              @plugin.homeconnect.setActiveProgram(@haid,po.key,options)
-              .then(()=>
-                resolve()
-              )
-              .catch((err)=>
-                env.logger.error "Error setActiveProgram "
-                reject()
-              )
-            when "startoptions"
-              activeStates = ['Ready','Pause']
-              unless @attributeValues.OperationState in activeStates
-                #env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
-                reject()
-                return
-              if _programAndOptions["program"]?
-                po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(_programAndOptions["program"])>=0)
-                if po?
-                  _key = po.key
-                else
-                  env.logger.debug "Invalid program name '#{_programAndOptions["program"]}'"
-                  reject()
-                  return
-              else
-                po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(@attributeValues["program"])>=0)
-                _key = po.key
+            env.logger.info "_key: " + _key + ", options: " + JSON.stringify(options,null,2)
 
-              options = []
-              for option in po.options
-                #env.logger.info "Po.option: " + JSON.stringify(option,null,2)
-                if _programAndOptions[@getLastValue(option.key)]?
-                  _parameter =
-                    key: option.key
-                  if option.type is "Int"
-                    _parameter["value"] = Number _programAndOptions[@getLastValue(option.key)]
-                  else
-                    if option.type is "Boolean"
-                      _parameter["value"] = Boolean _programAndOptions[@getLastValue(option.key)]
-                    else
-                      _parameter["value"] = option.type + '.' + _programAndOptions[@getLastValue(option.key)]
-                  #env.logger.info "_parameter " + JSON.stringify(_parameter,null,2)
-                  options.push _parameter
-                else
-                  lastValue = @attributeValues[@getLastValue(option.key)]
-                  if _.isNumber(lastValue)
-                    _value = Number lastValue
-                  else
-                    _value = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
-                  options.push {key: option.key, value: _value}
-
-              env.logger.info "_key: " + _key + ", options: " + JSON.stringify(options,null,2)
-
-              if @haid? and _key? and options?
-                @plugin.homeconnect.setSelectedProgram(@haid, _key, options)
-                .then((appliances)=>
-                  @plugin.homeconnect.setActiveProgram(@haid, _key, options)
-                  .then(()=>
-                    resolve()
-                  )
-                  .catch((err)=>
-                    env.logger.error "Error setActiveProgram " + err
-                    reject()
-                  )
-                ).catch((err)=>
-                  env.logger.debug "Error handled setProgram " + err
-                )
-              else
-                env.logger.debug "Invalid @haid, _key or options"
-                reject()
-            when "stop"
-              activeStates = ['DelayedStart','Run','Pause','ActionRequired']
-              unless @attributeValues.OperationState in activeStates
-                env.logger.debug "Stop not allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
-                reject()
-                return
-              @plugin.homeconnect.stopActiveProgram(@haid)
-              .then(()=>
-                resolve()
-              )
-              .catch((err)=>
-                env.logger.error "Error stopActiveProgram"
-                reject()
-              )
-            when "pause"
-              unless _.find(@deviceAdapter.supportedCommands, (c) => (c.key).indexOf("BSH.Common.Command.PauseProgram")>=0)?
-                env.logger.debug  "Pause not supported for device #{@haid}"
-                reject()
-              activeStates = [
-                'BSH.Common.EnumType.OperationState.Run'
-              ]
-              if status.value in activeStates
-                @plugin.homeconnect.setCommand(@haid,'BSH.Common.Command.PauseProgram')
+            if @haid? and _key? and options?
+              @plugin.homeconnect.setSelectedProgram(@haid, _key, options)
+              .then((appliances)=>
+                @plugin.homeconnect.setActiveProgram(@haid, _key, options)
                 .then(()=>
                   resolve()
                 )
                 .catch((err)=>
-                  env.logger.debug  "Handled Error setCommand PauseProgram: #{@haid} " + err.message
+                  env.logger.error "Error setActiveProgram " + err
                   reject()
                 )
-            when "resume"
-              unless _.find(@deviceAdapter.supportedCommands, (c) => (c.key).indexOf("BSH.Common.Command.ResumeProgram")>=0)?
-                env.logger.debug  "Pause not supported for device #{@haid}"
-                reject()
-              activeStates = [
-                'BSH.Common.EnumType.OperationState.Pause'
-              ]
-              if status.value in activeStates
-                @plugin.homeconnect.setCommand(@haid,"BSH.Common.Command.ResumeProgram")
-                .then(()=>
-                  resolve()
-                )
-                .catch((err)=>
-                  env.logger.debug "Handled Error setCommand PauseProgram: #{@haid} - " + err.message
-                  reject()
-                )
+              ).catch((err)=>
+                env.logger.debug "Error handled setProgram " + err
+              )
             else
+              env.logger.debug "Invalid @haid, _key or options"
               reject()
-        else
-          env.logger.debug "ProgramAndOptions '#{_programAndOptions}' not valid" + err
-          reject()
+          when "stop"
+            activeStates = ['DelayedStart','Run','Pause','ActionRequired']
+            unless @attributeValues.OperationState in activeStates
+              env.logger.debug "Stop not allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+              reject()
+              return
+            @plugin.homeconnect.stopActiveProgram(@haid)
+            .then(()=>
+              resolve()
+            )
+            .catch((err)=>
+              env.logger.error "Error stopActiveProgram"
+              reject()
+            )
+          when "pause"
+            unless _.find(@deviceAdapter.supportedCommands, (c) => (c.key).indexOf("BSH.Common.Command.PauseProgram")>=0)?
+              env.logger.debug  "Pause not supported for device #{@haid}"
+              reject()
+            activeStates = [
+              'BSH.Common.EnumType.OperationState.Run'
+            ]
+            if status.value in activeStates
+              @plugin.homeconnect.setCommand(@haid,'BSH.Common.Command.PauseProgram')
+              .then(()=>
+                resolve()
+              )
+              .catch((err)=>
+                env.logger.debug  "Handled Error setCommand PauseProgram: #{@haid} " + err.message
+                reject()
+              )
+          when "resume"
+            unless _.find(@deviceAdapter.supportedCommands, (c) => (c.key).indexOf("BSH.Common.Command.ResumeProgram")>=0)?
+              env.logger.debug  "Resume not supported for device #{@haid}"
+              reject()
+            activeStates = [
+              'BSH.Common.EnumType.OperationState.Pause'
+            ]
+            if status.value in activeStates
+              @plugin.homeconnect.setCommand(@haid,"BSH.Common.Command.ResumeProgram")
+              .then(()=>
+                resolve()
+              )
+              .catch((err)=>
+                env.logger.debug "Handled Error setCommand PauseProgram: #{@haid} - " + err.message
+                reject()
+              )
+          else
+            reject()
       )
 
     destroy:() =>
@@ -687,6 +687,7 @@ module.exports = (env) ->
 
       @program = null
       @options = null
+      @programAndOptions = null
 
       setCommand = (command) =>
         @command = command
@@ -759,10 +760,15 @@ module.exports = (env) ->
       if simulate
         return __("would have cleaned \"%s\"", "")
       else
-        _var = @programAndOptions.slice(1) if @programAndOptions.indexOf('$') >= 0
-        _programAndOptions = @framework.variableManager.getVariableValue(_var)
-        unless _programAndOptions?
-          return __("\"%s\" Rule not executed, #{_var} is not a valid variable", "")
+        if @programAndOptions?
+          _var = @programAndOptions.slice(1) if @programAndOptions.indexOf('$') >= 0
+          _programAndOptions = @framework.variableManager.getVariableValue(_var)
+          env.logger.info "_var " + _var 
+          unless _programAndOptions?
+            return __("\"%s\" Rule not executed, #{_var} is not a valid variable", "")
+        else
+          __programAndOptions = null
+  
         @homeconnectDevice.execute(@homeconnectDevice, @command, _programAndOptions)
         .then(()=>
           return __("\"%s\" Rule executed", @command)
