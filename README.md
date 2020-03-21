@@ -117,4 +117,4 @@ ___ReferenceMapID___: TempMap, Map1, Map2, Map3, Map4, Map5
 
 
 ---
-$$The minimum requirement for this plugin is node v8!$$
+__The minimum requirement for this plugin is node v8!__
