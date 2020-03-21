@@ -32,7 +32,9 @@ homeconnect <device id or name> [start, startopts $<programOptionsVariable>, pau
 Whether an action is available, is depending on the device capabilities and the allowed control scope.
 
 The format for the $\<programOptionsVariable\> is:
-program: \<programId\>, \<optionname\>: \<optionValue\>, \<optionname\>: \<optionValue\>, ...
+```
+program: <programId>, <optionname>: <optionValue>, <optionname>: <optionValue>, ...
+```
 
 Example for CoffeeMaker
 
