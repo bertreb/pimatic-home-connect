@@ -37,7 +37,7 @@ program: \<programId\>, \<optionname\>: \<optionValue\>, \<optionname\>: \<optio
 Example for CoffeeMaker
 
 ```
-homeconnect \<CoffeeMakerId\> startopts $options
+homeconnect <CoffeeMakerId> startopts $options
 ```
 Value of the variable $options is
 ```
