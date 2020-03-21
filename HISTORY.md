@@ -37,3 +37,5 @@
 * 20200318, v0.1.8
 	* added descriptions of programs and options
 	* small fix
+* 20200322, v0.2.0
+	* added Hood and Cleaning robot

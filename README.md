@@ -16,7 +16,7 @@ For live usage create another application and use Device Flow as authorisation t
 5. create a HomeconnectManager device
 6. start discovery and add discovered devices
 
-The devices CoffeeMaker, Washer, DishWasher, Oven, Dryer and FridgeFreezer are implemented. In simulator mode the approval of the Home-Connect access rights is handled by the plugin. No popup screen!
+The devices CoffeeMaker, Washer, DishWasher, Oven, Dryer, FridgeFreezer, Hood and CleaningRobot are implemented. In simulator mode the approval of the Home-Connect access rights is handled by the plugin. No popup screen!
 In Live mode the approval is done via the gui. In the HomeconnectManager device the link in the label is used for the authentication uri.
 
 Devices must be added via the device discovery.
@@ -100,6 +100,21 @@ ___SuperModeRefrigerator___: false or true
 ___SuperModeFreezer___: false or true
 
 ___EcoMode___: false or true
+
+### Hood
+___Programs___: Automatic, Venting, DelayedShutOff
+
+___VentingLevel___: FanOff, FanStage01, FanStage02, FanStage03, FanStage04, FanStage05
+
+___IntensiveLevel___: IntensiveStageOff, IntensiveStage1, IntensiveStage2
+
+### CleaningRobot
+___Programs___: CleanAll, CleanMap, GoHome
+
+___CleaningMode___: Silent, Standard, Power
+
+___ReferenceMapID___: TempMap, Map1, Map2, Map3, Map4, Map5
+
 
 ---
 ___The minimum requirement for this plugin is node v8!___

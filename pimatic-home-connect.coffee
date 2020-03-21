@@ -64,7 +64,7 @@ module.exports = (env) ->
           )
         )
 
-      @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher","FridgeFreezer","Dryer"]
+      @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher","FridgeFreezer","Dryer","Hood","CleaningRobot"]
 
       @framework.deviceManager.registerDeviceClass('HomeconnectManager', {
         configDef: @deviceConfigDef.HomeconnectManager,
@@ -192,6 +192,8 @@ module.exports = (env) ->
           @deviceAdapter = new Appliances.Dryer()
         when "Hood"
           @deviceAdapter = new Appliances.Hood()
+        when "CleaningRobot"
+          @deviceAdapter = new Appliances.CleaningRobot()
         else
           env.logger.debug "Device type #{@hatype} not yet supported"
           return
@@ -466,6 +468,8 @@ module.exports = (env) ->
                 resultEvnt["value"] = false
               else
                 resultEvnt["value"] = false
+          else
+            resultEvnt["value"] = @getLastValue(programOrOption.value)
           return resultEvnt
       catch err
         env.logger.debug "Error in event handled " + err + ", event data: " + JSON.stringify(evnt,null,2)
@@ -625,6 +629,9 @@ module.exports = (env) ->
                 reject()
               )
             when "pause"
+              unless _.find(@deviceAdapter.supportedCommands, (c) => (c.key).indexOf("BSH.Common.Command.PauseProgram")>=0)?
+                env.logger.debug  "Pause not supported for device #{@haid}"
+                reject()
               activeStates = [
                 'BSH.Common.EnumType.OperationState.Run'
               ]
@@ -638,6 +645,9 @@ module.exports = (env) ->
                   reject()
                 )
             when "resume"
+              unless _.find(@deviceAdapter.supportedCommands, (c) => (c.key).indexOf("BSH.Common.Command.ResumeProgram")>=0)?
+                env.logger.debug  "Pause not supported for device #{@haid}"
+                reject()
               activeStates = [
                 'BSH.Common.EnumType.OperationState.Pause'
               ]

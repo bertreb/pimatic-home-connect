@@ -130,6 +130,26 @@ module.exports = (env) ->
         }       
       ]
       
+      @supportedCommands = [
+        {
+          name: "PauseProgram"
+          type: "boolean"
+          description: "Pause Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.PauseProgram"
+        },
+        {
+          name: "ResumeProgram"
+          type: "boolean"
+          description: "Resume Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.ResumeProgram"
+        }
+      ]
+
+
   class Oven
     constructor: () ->
       @programs = [
@@ -296,6 +316,25 @@ module.exports = (env) ->
         } 
       ]
 
+      @supportedCommands = [
+        {
+          name: "PauseProgram"
+          type: "boolean"
+          description: "Pause Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.PauseProgram"
+        },
+        {
+          name: "ResumeProgram"
+          type: "boolean"
+          description: "Resume Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.ResumeProgram"
+        }
+      ]
+
   class Washer
     constructor: () ->
       @programs = [
@@ -425,6 +464,25 @@ module.exports = (env) ->
           default: false
           key: "BSH.Common.Status.LocalControlActive"
         } 
+      ]
+
+      @supportedCommands = [
+        {
+          name: "PauseProgram"
+          type: "boolean"
+          description: "Pause Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.PauseProgram"
+        },
+        {
+          name: "ResumeProgram"
+          type: "boolean"
+          description: "Resume Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.ResumeProgram"
+        }
       ]
 
   class Dishwasher
@@ -580,6 +638,25 @@ module.exports = (env) ->
           unit: ""
           default: ""
           key: "BSH.Common.Status.RemoteControlStartAllowed"
+        }
+      ]
+
+      @supportedCommands = [
+        {
+          name: "PauseProgram"
+          type: "boolean"
+          description: "Pause Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.PauseProgram"
+        },
+        {
+          name: "ResumeProgram"
+          type: "boolean"
+          description: "Resume Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.ResumeProgram"
         }
       ]
 
@@ -794,6 +871,25 @@ module.exports = (env) ->
         } 
       ]
 
+      @supportedCommands = [
+        {
+          name: "PauseProgram"
+          type: "boolean"
+          description: "Pause Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.PauseProgram"
+        },
+        {
+          name: "ResumeProgram"
+          type: "boolean"
+          description: "Resume Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.ResumeProgram"
+        }
+      ]
+
   class Hood
     constructor: () ->
       @programs = [
@@ -955,6 +1051,234 @@ module.exports = (env) ->
         } 
       ]
 
+  class CleaningRobot
+    constructor: () ->
+      @programs = [
+        {name: "ConsumerProducts.CleaningRobot.Program.Cleaning.CleanAll"},
+        {name: "ConsumerProducts.CleaningRobot.Program.Cleaning.CleanMap"},
+        {name: "ConsumerProducts.CleaningRobot.Program.Basic.GoHome "}
+      ]
+      @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @supportedOptions = [
+        {
+          name: "ReferenceMapId"
+          type: "string"
+          description: "ReferenceMapId for Available maps"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Option.ReferenceMapId"
+        },
+        {
+          name: "CleaningMode"
+          type: "string"
+          description: "CleaningMode"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Option.CleaningMode"
+        },
+        {
+          name: "CurrentMap"
+          type: "string"
+          description: "CurrentMap"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Setting.CurrentMap"
+        },
+        {
+          name: "NameOfMap1"
+          type: "string"
+          description: "NameOfMap1"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Setting.NameOfMap1"
+        },
+        {
+          name: "NameOfMap2"
+          type: "string"
+          description: "NameOfMap2"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Setting.NameOfMap2"
+        },
+        {
+          name: "NameOfMap3"
+          type: "string"
+          description: "NameOfMap3"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Setting.NameOfMap3"
+        },
+        {
+          name: "NameOfMap4"
+          type: "string"
+          description: "NameOfMap4"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Setting.NameOfMap4"
+        },
+        {
+          name: "NameOfMap5"
+          type: "string"
+          description: "NameOfMap5"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Setting.NameOfMap5"
+        }
+      ]
+
+      @supportedEvents = [
+        {
+          name: "ProgramFinished"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramFinished"
+        },
+        {
+          name: "ProgramAborted"
+          type: "string"
+          description: ""
+          unit: ""
+          default: "false"
+          key: "BSH.Common.Event.ProgramAborted"
+        },
+        {
+          name: "EmptyDustBoxAndCleanFilter"
+          type: "string"
+          description: "EmptyDustBoxAndCleanFilter"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Event.EmptyDustBoxAndCleanFilter"
+        },
+        {
+          name: "RobotIsStuck"
+          type: "string"
+          description: "RobotIsStuck"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Event.RobotIsStuck"
+        },
+        {
+          name: "DockingStationNotFound"
+          type: "string"
+          description: "DockingStationNotFound"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Event.DockingStationNotFound"
+        }
+      ]
+
+      @supportedStatus = [
+        {
+          name: "CameraState"
+          type: "string"
+          description: "CameraState"
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.Video.CameraState"
+        },
+        {
+          name: "ElapsedProgramTime"
+          type: "number"
+          description: ""
+          unit: "sec"
+          default: 0
+          key: "BSH.Common.Option.ElapsedProgramTime"
+        },
+        {
+          name: "OperationState"
+          type: "string"
+          description: ""
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.OperationState"
+        },
+        {
+          name: "DustBoxInserted"
+          type: "boolean"
+          description: "DustBoxInserted"
+          unit: ""
+          default: false
+          key: "ConsumerProducts.CleaningRobot.Status.DustBoxInserted"
+        },
+        {
+          name: "LastSelectedMap"
+          type: "string"
+          description: "LastSelectedMap"
+          unit: ""
+          default: ""
+          key: "ConsumerProducts.CleaningRobot.Status.LastSelectedMap"
+        },
+        {
+          name: "Lost"
+          type: "boolean"
+          description: "Cleaning robot Lost"
+          unit: ""
+          default: false
+          key: "ConsumerProducts.CleaningRobot.Status.Lost"
+        },
+        {
+          name: "Lifted"
+          type: "boolean"
+          description: "Cleaning robot Lifted"
+          unit: ""
+          default: false
+          key: "ConsumerProducts.CleaningRobot.Status.Lifted"
+        },
+        {
+          name: "BatteryLevel"
+          type: "number"
+          description: "Cleaning robot BatteryLevel"
+          unit: "%"
+          default: 100
+          key: "BSH.Common.Status.BatteryLevel"
+        },
+        {
+          name: "BatteryChargingState"
+          type: "string"
+          description: "Cleaning robot BatteryChargingState"
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.BatteryChargingState"
+        },
+        {
+          name: "ChargingConnection"
+          type: "string"
+          description: "Cleaning robot ChargingConnection"
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.ChargingConnection"
+        },
+        {
+          name: "CameraState"
+          type: "string"
+          description: "Cleaning robot CameraState"
+          unit: ""
+          default: ""
+          key: "BSH.Common.Status.Video.CameraState"
+        }        
+      ]
+
+      @supportedCommands = [
+        {
+          name: "PauseProgram"
+          type: "boolean"
+          description: "Pause Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.PauseProgram"
+        },
+        {
+          name: "ResumeProgram"
+          type: "boolean"
+          description: "Resume Program"
+          unit: ""
+          default: false
+          key: "BSH.Common.Command.ResumeProgram"
+        }
+      ]
+
   return exports = {
     CoffeeMaker
     Oven
@@ -963,4 +1287,5 @@ module.exports = (env) ->
     Dryer
     FridgeFreezer
     Hood
+    CleaningRobot
   }
