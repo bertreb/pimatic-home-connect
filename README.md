@@ -33,7 +33,7 @@ Whether an action is available, is depending on the device capabilities and the 
 
 The format for the $\<programOptionsVariable\> is:
 ```
-program: <programId>, <optionname>: <optionValue>, <optionname>: <optionValue>, ...
+program: <programId>, <optionName>: <optionValue>, <optionName>: <optionValue>, ...
 ```
 
 Example for CoffeeMaker
@@ -54,9 +54,7 @@ The following program and options settings are the maximum available for a devic
 ### Coffeemaker
 ___Programs___: Espresso, EspressoMacchiato, Coffee, Cappuccino, LatteMacchiato, CaffeLatte, Americano, EspressoDoppio, FlatWhite, Galao, MilkFroth, WarmMilk, Ristretto, Cortado, KleinerBrauner, GrosserBrauner, Verlaengerter, VerlaengerterBraun, WienerMelange, FlatWhite, Cortado, CafeCortado, CafeConLeche, CafeAuLait, Doppio, Kaapi, KoffieVerkeerd, Galao, Garoto, Americano, RedEye, BlackEye, DeadEye
 
-___BeanAmount___: VeryMild, Mild, MildPlus, Normal, NormalPlus, Strong, StrongPlus, VeryStrong, VeryStrongPlus, ExtraStrong, DoubleShot
-
-___DoubleShotPlus___, DoubleShotPlusPlus, CoffeeGround
+___BeanAmount___: VeryMild, Mild, MildPlus, Normal, NormalPlus, Strong, StrongPlus, VeryStrong, VeryStrongPlus, ExtraStrong, DoubleShot, DoubleShotPlus, DoubleShotPlusPlus, CoffeeGround
 
 ___CoffeeTemperature___: 88C, 90C, 92C, 94C, 95C, 96C
 
@@ -79,7 +77,7 @@ ___Programs___: PreHeating, HotAir, TopBottomHeating, PizzaSetting, HotAirEco, H
 
 ___SetpointTemperature___: 30 - 275 (in °C)
 
-___Duration___, 1 - 86340 (in seconds)
+___Duration___: 1 - 86340 (in seconds)
 
 ___FastPreHeat___: false or true
 
