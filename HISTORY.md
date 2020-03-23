@@ -39,3 +39,5 @@
 	* small fix
 * 20200322, v0.2.0
 	* added Hood and Cleaning robot
+* 20200322, v0.2.1
+	* added debug info
