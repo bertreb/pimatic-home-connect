@@ -773,10 +773,10 @@ module.exports = class HomeConnectAPI extends EventEmitter {
                         event[key] = value;
                     }
                 });
-                this.debug('Terminated ' + description + ' without error');
+                this.debug('Terminated handled' + description + ' without error');
                 dispatch({ event: 'STOP' });
             } catch (err) {
-                this.error('Terminated ' + description + ': ' + err.message);
+                this.debug('Terminated error handled' + description + ': ' + err.message);
                 dispatch({ event: 'STOP', err: err });
             }
         }
