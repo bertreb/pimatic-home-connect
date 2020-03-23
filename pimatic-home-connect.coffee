@@ -32,7 +32,7 @@ module.exports = (env) ->
         )
         .then((savedTokens) =>
           #check if savedTokens are expired
-          if (savedTokens[@clientId].accessExpires) < Date.now() or not savedTokens[@clientId]?
+          if (savedTokens[@clientId].accessExpires < Date.now()) or not savedTokens[@clientId]?
             _savedTokens = null # token expired
             env.logger.debug "Stored tokens expired"
           else
