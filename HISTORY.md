@@ -41,3 +41,5 @@
 	* added Hood and Cleaning robot
 * 20200322, v0.2.1
 	* added debug info
+* 20200322, v0.2.4
+	* added rinsing on/off for CoffeeMaker

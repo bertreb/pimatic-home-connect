@@ -36,7 +36,9 @@ module.exports = (env) ->
         {name: "ConsumerProducts.CoffeeMaker.Program.CoffeeWorld.Americano"},
         {name: "ConsumerProducts.CoffeeMaker.Program.CoffeeWorld.RedEye"},
         {name: "ConsumerProducts.CoffeeMaker.Program.CoffeeWorld.BlackEye"},
-        {name: "ConsumerProducts.CoffeeMaker.Program.CoffeeWorld.DeadEye"}
+        {name: "ConsumerProducts.CoffeeMaker.Program.CoffeeWorld.DeadEye"},
+        {name: "ConsumerProducts.CoffeeMaker.Program.CleaningModes.ApplianceOnRinsing"},
+        {name: "ConsumerProducts.CoffeeMaker.Program.CleaningModes.ApplianceOffRinsing"}
       ]
 
       @powerOffState = "BSH.Common.EnumType.PowerState.Standby"
