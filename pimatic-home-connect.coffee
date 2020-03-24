@@ -418,6 +418,16 @@ module.exports = (env) ->
           value: @getLastValue(_value)
         return resultProg
 
+      if (@deviceAdapter.activeProgram).indexOf(programOrOption.key)>=0
+        if programOrOption.value?
+          _value = programOrOption.value
+        else
+          _value = programOrOption.key
+        resultProg =
+          name: "program"
+          value: @getLastValue(_value)
+        return resultProg
+
       prog = _.find(@deviceAdapter.programs, (p)=> (p.name).indexOf(programOrOption.key)>=0)
       if prog?
         if programOrOption.value?

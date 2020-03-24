@@ -43,6 +43,7 @@ module.exports = (env) ->
 
       @powerOffState = "BSH.Common.EnumType.PowerState.Standby"
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @activeProgram = "BSH.Common.Root.ActiveProgram"
       @supportedOptions = [
         {
           name: "CoffeeTemperature"
@@ -173,6 +174,7 @@ module.exports = (env) ->
         {name: "Cooking.Oven.Program.HeatingMode.Proof"}
       ]
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @activeProgram = "BSH.Common.Root.ActiveProgram"
       @supportedOptions = [
         {
           name: "SetpointTemperature"
@@ -363,6 +365,7 @@ module.exports = (env) ->
         {name: "LaundryCare.Washer.Program.WaterProof"}
       ]
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @activeProgram = "BSH.Common.Root.ActiveProgram"
       @supportedOptions = [
         {
           name: "RemainingProgramTime"
@@ -514,6 +517,7 @@ module.exports = (env) ->
         {name: "Dishcare.Dishwasher.Program.MaximumCleaning"}
       ]
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @activeProgram = "BSH.Common.Root.ActiveProgram"
       @supportedOptions = [
         {
           name: "RemainingProgramTime"
@@ -666,6 +670,7 @@ module.exports = (env) ->
     constructor: () ->
       @programs = []
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @activeProgram = "BSH.Common.Root.ActiveProgram"
       @supportedOptions = [
         {
           name: "SetpointTemperatureRefrigerator"
@@ -776,6 +781,7 @@ module.exports = (env) ->
         {name: "LaundryCare.Dryer.Program.AntiShrink"}     
       ]
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @activeProgram = "BSH.Common.Root.ActiveProgram"
       @supportedOptions = [
         {
           name: "DryingTarget"
@@ -900,6 +906,7 @@ module.exports = (env) ->
         {name: "Cooking.Common.Program.Hood.DelayedShutOff "}
       ]
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @activeProgram = "BSH.Common.Root.ActiveProgram"
       @supportedOptions = [
         {
           name: "Duration"
@@ -1061,6 +1068,7 @@ module.exports = (env) ->
         {name: "ConsumerProducts.CleaningRobot.Program.Basic.GoHome "}
       ]
       @selectedProgram = "BSH.Common.Root.SelectedProgram"
+      @activeProgram = "BSH.Common.Root.ActiveProgram"
       @supportedOptions = [
         {
           name: "ReferenceMapId"
