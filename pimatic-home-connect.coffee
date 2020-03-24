@@ -408,7 +408,7 @@ module.exports = (env) ->
 
     getProgramOrOption: (programOrOption) =>
 
-      if (@deviceAdapter.selectedProgram).indexOf(programOrOption.key)>=0
+      if (@deviceAdapter.activeProgram).indexOf(programOrOption.key)>=0
         if programOrOption.value?
           _value = programOrOption.value
         else
@@ -418,7 +418,7 @@ module.exports = (env) ->
           value: @getLastValue(_value)
         return resultProg
 
-      if (@deviceAdapter.activeProgram).indexOf(programOrOption.key)>=0
+      if (@deviceAdapter.selectedProgram).indexOf(programOrOption.key)>=0
         if programOrOption.value?
           _value = programOrOption.value
         else
