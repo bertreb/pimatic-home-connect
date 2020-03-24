@@ -43,5 +43,5 @@
 	* added debug info
 * 20200322, v0.2.4
 	* added rinsing on/off for CoffeeMaker
-* 20200322, v0.2.6
+* 20200322, v0.2.7
 	* added ActiveProgram status

@@ -412,7 +412,7 @@ module.exports = (env) ->
         if programOrOption.value?
           _value = programOrOption.value
         else
-          _value = programOrOption.key
+          _value = @attributesValues["program"] # use current value
         resultProg =
           name: "program"
           value: @getLastValue(_value)
@@ -422,7 +422,7 @@ module.exports = (env) ->
         if programOrOption.value?
           _value = programOrOption.value
         else
-          _value = programOrOption.key
+          _value = @attributesValues["program"] # use current value
         resultProg =
           name: "program"
           value: @getLastValue(_value)
