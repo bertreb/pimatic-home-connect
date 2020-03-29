@@ -45,3 +45,5 @@
 	* added rinsing on/off for CoffeeMaker
 * 20200322, v0.2.7
 	* added ActiveProgram status
+* 20200329, v0.2.8
+	* added error handling

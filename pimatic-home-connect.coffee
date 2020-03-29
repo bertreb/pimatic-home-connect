@@ -64,6 +64,9 @@ module.exports = (env) ->
             )
           )
         )
+        .catch((err)=>
+          env.logger.debug "Error savedTokens handled " + err
+        )
 
       @supportedTypes = ["CoffeeMaker","Oven","Washer","Dishwasher","FridgeFreezer","Dryer","Hood","CleaningRobot"]
 
