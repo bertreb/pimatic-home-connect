@@ -32,12 +32,16 @@ module.exports = (env) ->
         )
         .then((savedTokens) =>
           #check if savedTokens are expired
-          if (savedTokens[@clientId].accessExpires < Date.now()) or not savedTokens[@clientId]?
-            _savedTokens = null # token expired
-            env.logger.debug "Stored tokens expired"
+          if savedTokens[@clientId]?
+            if (savedTokens[@clientId].accessExpires < Date.now())
+              _savedTokens = savedTokens[@clientId]
+              env.logger.debug "Stored tokens retrieved" #  + JSON.stringify(savedTokens,null,2)
+            else
+              _savedTokens = null # token expired
+              env.logger.debug "Stored tokens expired"
           else
-            _savedTokens = savedTokens[@clientId]
-            env.logger.debug "Stored tokens retrieved" #  + JSON.stringify(savedTokens,null,2)
+            _savedTokens = null # token expired
+            env.logger.debug "No stored tokens"
           @homeconnect = new HomeConnectAPI({
             log:        env.logger,
             clientID:   @clientId,
