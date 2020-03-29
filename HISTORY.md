@@ -47,5 +47,5 @@
 	* added ActiveProgram status
 * 20200329, v0.2.8
 	* added error handling
-* 20200329, v0.2.9
+* 20200329, v0.2.10
 	* added check on savedTokens
