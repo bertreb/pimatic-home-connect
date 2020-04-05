@@ -544,13 +544,7 @@ module.exports = (env) ->
           reject()
           return
 
-        if programAndOptions?
-          if not @parseProgramAndOptions(programAndOptions)?
-            env.logger.debug "ProgramAndOptions '#{programAndOptions}' not valid" + err
-            reject()
-            return
-
-        #env.logger.info "command: " + command + ", programAndOptions: " + JSON.stringify(programAndOptions,null,2)
+        env.logger.info "command: " + command + ", programAndOptions: " + JSON.stringify(_programAndOptions,null,2)
         switch command
           when "start"
             activeStates = ['Ready','Pause']
@@ -577,9 +571,26 @@ module.exports = (env) ->
               reject()
             )
           when "startoptions"
+            if programAndOptions?
+              _programAndOptions = @parseProgramAndOptions(programAndOptions)
+            else
+              env.logger.debug "ProgramAndOptions empty" + err
+              reject()
+              return
+            unless _programAndOptions?
+              env.logger.debug "ProgramAndOptions '#{_programAndOptions}' not valid" + err
+              reject()
+              return
+
             activeStates = ['Ready','Pause']
             unless @attributeValues.OperationState in activeStates
-              #env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+              env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
+              reject()
+              return
+
+            _programAndOptions = @parseProgramAndOptions(programAndOptions)
+            if not _programAndOptions?
+              env.logger.debug "ProgramAndOptions '#{_programAndOptions}' not valid" + err
               reject()
               return
             if _programAndOptions["program"]?
@@ -596,7 +607,6 @@ module.exports = (env) ->
 
             options = []
             for option in po.options
-              #env.logger.info "Po.option: " + JSON.stringify(option,null,2)
               if _programAndOptions[@getLastValue(option.key)]?
                 _parameter =
                   key: option.key
@@ -632,6 +642,7 @@ module.exports = (env) ->
                 )
               ).catch((err)=>
                 env.logger.debug "Error handled setProgram " + err
+                reject()
               )
             else
               env.logger.debug "Invalid @haid, _key or options"

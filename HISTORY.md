@@ -49,3 +49,5 @@
 	* added error handling
 * 20200329, v0.2.10
 	* added check on savedTokens
+* 20200405, v0.2.11
+	* fixed startopts
