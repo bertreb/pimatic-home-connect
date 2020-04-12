@@ -51,3 +51,5 @@
 	* added check on savedTokens
 * 20200405, v0.2.11
 	* fixed startopts
+* 20200412, v0.2.12
+	* fixed debug handling

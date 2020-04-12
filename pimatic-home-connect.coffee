@@ -544,7 +544,7 @@ module.exports = (env) ->
           reject()
           return
 
-        env.logger.info "command: " + command + ", programAndOptions: " + JSON.stringify(_programAndOptions,null,2)
+        #env.logger.info "command: " + command + ", programAndOptions: " + JSON.stringify(programAndOptions,null,2)
         switch command
           when "start"
             activeStates = ['Ready','Pause']
