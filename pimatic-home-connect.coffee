@@ -502,31 +502,29 @@ module.exports = (env) ->
           for parameter in parameters
             tokens = parameter.split(":")
             par =
-              key: (tokens[0].trimEnd()).trimStart()
-              value: (tokens[1].trimEnd()).trimStart()
+              key: tokens[0].trim()
+              value: tokens[1].trim()
             progAndOpts[par.key] = par.value
 
-            invalidValue = true
             #env.logger.info "par.key: " + JSON.stringify(par.key,null,2) + ", par.value: " + par.value
             if par.key == "program"
-              if _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)?
-                invalidValue = false
+              unless _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)?
+                invalidProgramValue = true
             else
               for program in @availableProgramsAndOptions
                 for option in program.options
                   #env.logger.info "option: " + JSON.stringify(option,null,2) + ", par.value: " + par.value
                   if option.unit is "enum"
-                    if _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)?
-                      invalidValue = false
-                  if option.type is "Int"
-                    min = option.constraints.min
-                    max = option.constraints.max
+                    unless _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)?
+                      env.logger.debug "Invalid value #{par.value}"
+                      return null
+                  else if option.type is "Int"
+                    min = Number option.constraints.min
+                    max = Number option.constraints.max
                     stepsize = if option.constraints.stepsize? then option.constraints.stepsize else 1
-                    if par.value >= min and par.value <= max and (par.value / stepsize) % 1 < 0.0001
-                      invalidValue = false
-            if invalidValue
-              env.logger.debug "Invalid value #{par.value}"
-              return null
+                    unless (Number par.value) >= min and (Number par.value) <= max and ((Number par.value) / stepsize) % 1 < 0.0001
+                      env.logger.debug "Invalid option value #{par.value}"
+                      return null
           return progAndOpts
         catch err
           env.logger.debug "Handled error in parseProgramAndOptions " + err
@@ -541,7 +539,7 @@ module.exports = (env) ->
           return
         if @attributeValues.RemoteStart == false
           env.logger.debug "RemoteControlStart not allowed for device #{@haid}"
-          reject()
+          reject("RemoteControlStart not allowed")
           return
 
         #env.logger.info "command: " + command + ", programAndOptions: " + JSON.stringify(programAndOptions,null,2)
@@ -550,7 +548,7 @@ module.exports = (env) ->
             activeStates = ['Ready','Pause']
             unless @attributeValues.OperationState in activeStates
               env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
-              reject()
+              reject("No start allowed for device")
               return
             po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(@attributeValues["program"])>=0)
             options = []
@@ -568,30 +566,30 @@ module.exports = (env) ->
             )
             .catch((err)=>
               env.logger.error "Error setActiveProgram "
-              reject()
+              reject("Error setActiveProgram")
             )
           when "startoptions"
             if programAndOptions?
               _programAndOptions = @parseProgramAndOptions(programAndOptions)
             else
               env.logger.debug "ProgramAndOptions empty" + err
-              reject()
+              reject("ProgramAndOptions empty")
               return
             unless _programAndOptions?
               env.logger.debug "ProgramAndOptions '#{_programAndOptions}' not valid" + err
-              reject()
+              reject("ProgramAndOptions not valid 1")
               return
 
             activeStates = ['Ready','Pause']
             unless @attributeValues.OperationState in activeStates
               env.logger.debug "No start allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
-              reject()
+              reject("No start allowed")
               return
 
-            _programAndOptions = @parseProgramAndOptions(programAndOptions)
+            #_programAndOptions = @parseProgramAndOptions(programAndOptions)
             if not _programAndOptions?
               env.logger.debug "ProgramAndOptions '#{_programAndOptions}' not valid" + err
-              reject()
+              reject("ProgramAndOptions not valid 2")
               return
             if _programAndOptions["program"]?
               po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(_programAndOptions["program"])>=0)
@@ -599,7 +597,7 @@ module.exports = (env) ->
                 _key = po.key
               else
                 env.logger.debug "Invalid program name '#{_programAndOptions["program"]}'"
-                reject()
+                reject("Invalid program name")
                 return
             else
               po = _.find(@availableProgramsAndOptions, (po)=> (po.key).indexOf(@attributeValues["program"])>=0)
@@ -627,7 +625,7 @@ module.exports = (env) ->
                   _value = _.find(option.constraints.allowedvalues, (o)=> o.indexOf(@attributeValues[@getLastValue(option.key)]) >=0)
                 options.push {key: option.key, value: _value}
 
-            #env.logger.info "_key: " + _key + ", options: " + JSON.stringify(options,null,2)
+            env.logger.info "@haid: " + @haid + ", _key: " + _key + ", options: " + JSON.stringify(options,null,2)
 
             if @haid? and _key? and options?
               @plugin.homeconnect.setSelectedProgram(@haid, _key, options)
@@ -638,20 +636,20 @@ module.exports = (env) ->
                 )
                 .catch((err)=>
                   env.logger.error "Error setActiveProgram " + err
-                  reject()
+                  reject("Error setActiveProgram")
                 )
               ).catch((err)=>
                 env.logger.debug "Error handled setProgram " + err
-                reject()
+                reject("Error handled setProgram")
               )
             else
               env.logger.debug "Invalid @haid, _key or options"
-              reject()
+              reject("Invalid @haid, _key or options")
           when "stop"
             activeStates = ['DelayedStart','Run','Pause','ActionRequired']
             unless @attributeValues.OperationState in activeStates
               env.logger.debug "Stop not allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
-              reject()
+              reject("Stop not allowed for device")
               return
             @plugin.homeconnect.stopActiveProgram(@haid)
             .then(()=>
@@ -659,12 +657,12 @@ module.exports = (env) ->
             )
             .catch((err)=>
               env.logger.error "Error stopActiveProgram"
-              reject()
+              reject("Error stopActiveProgram")
             )
           when "pause"
             unless _.find(@deviceAdapter.supportedCommands, (c) => (c.key).indexOf("BSH.Common.Command.PauseProgram")>=0)?
               env.logger.debug  "Pause not supported for device #{@haid}"
-              reject()
+              reject("Pause not supported")
             activeStates = ['Run']
             if @attributeValues.OperationState in activeStates
               @plugin.homeconnect.setCommand(@haid,'BSH.Common.Command.PauseProgram')
@@ -673,11 +671,11 @@ module.exports = (env) ->
               )
               .catch((err)=>
                 env.logger.debug  "Handled Error setCommand PauseProgram: #{@haid} " + err.message
-                reject()
+                reject("Error setCommand PauseProgram")
               )
             else
               env.logger.debug "Pause not allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
-              reject()
+              reject("Pause not allowed")
           when "resume"
             unless _.find(@deviceAdapter.supportedCommands, (c) => (c.key).indexOf("BSH.Common.Command.ResumeProgram")>=0)?
               env.logger.debug  "Resume not supported for device #{@haid}"
@@ -690,13 +688,14 @@ module.exports = (env) ->
               )
               .catch((err)=>
                 env.logger.debug "Handled Error setCommand PauseProgram: #{@haid} - " + err.message
-                reject()
+                reject("Error setCommand PauseProgram")
               )
             else
               env.logger.debug "Resume not allowed for device '#{@haid}' when OperationState is '#{@attributeValues.OperationState}'"
-              reject()
+              reject("Resume not allowed")
           else
-            reject()
+            env.logger.debug  "Invalid execute command: '#{command}'"
+            reject("Invalid execute command")
       )
 
     destroy:() =>
@@ -804,7 +803,7 @@ module.exports = (env) ->
         .then(()=>
           return __("\"%s\" Rule executed", @command)
         ).catch((err)=>
-          return __("\"%s\" Rule not executed", "")
+          return __("\"%s\" Rule not executed: ", err)
         )
 
 
