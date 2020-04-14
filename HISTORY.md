@@ -55,5 +55,7 @@
 	* fixed debug handling
 * 20200414, v0.2.13
 	* added debug handling
-* 20200414, v0.2.14
+* 20200414, v0.2.15
 	* changed to 1-step execution command
+* 20200414, v0.2.16
+	* added options check

@@ -509,38 +509,29 @@ module.exports = (env) ->
               value: tokens[1].trim()
             progAndOpts[par.key] = par.value
 
-            ###
-            invalidProgram = true
-            invalidOption = true
-            invalidOptionValue = ""
             #env.logger.info "par.key: " + JSON.stringify(par.key,null,2) + ", par.value: " + par.value
             if par.key == "program"
-              if _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)?
-                invalidProgram = false
+              unless _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)?
+                env.logger.debug "Invalid program #{par.value}"
+                return null
             else
+              invalidOption = true
               for program in @availableProgramsAndOptions
                 for option in program.options
                   #env.logger.info "option: " + JSON.stringify(option,null,2) + ", par.value: " + par.value
                   if option.unit is "enum"
-                    if _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)
+                    if _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)?
                       invalidOption = false
-                    else
-                      invalidOptionValue = par.value
                   if option.type is "Int"
                     min = Number option.constraints.min
                     max = Number option.constraints.max
                     stepsize = if option.constraints.stepsize? then option.constraints.stepsize else 1
                     if (Number par.value) >= min and (Number par.value) <= max and ((Number par.value) / stepsize) % 1 < 0.0001
                       invalidOption = false
-                    else
-                      invalidOptionValue = par.value
-            if invalidProgram
-              env.logger.debug "Invalid value #{par.value}"
-              return null
-            if invalidOption
-              env.logger.debug "Invalid option #{}value #{invalidOptionValue}"
-              return null
-            ###
+              if invalidOption
+                env.logger.debug "Invalid option value"
+                return null
+
           env.logger.info "progAndOpts: " + JSON.stringify(progAndOpts,null,2)
           return progAndOpts
         catch err
@@ -823,7 +814,7 @@ module.exports = (env) ->
         .then(()=>
           return __("\"%s\" Rule executed", @command)
         ).catch((err)=>
-          return __("\"%s\" Rule not executed: ", err)
+          return __("\"%s\" Rule not executed", @command)
         )
 
 
