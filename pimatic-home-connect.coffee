@@ -392,6 +392,9 @@ module.exports = (env) ->
                 for p in program.options
                   @setProgramOrOption(p)
             )
+            .catch((err)=>
+              env.logger.debug "Handled error getSelectedProgram " + err
+            )
         catch err
           env.logger.debug "Error handled in received event " + err
 
@@ -506,25 +509,39 @@ module.exports = (env) ->
               value: tokens[1].trim()
             progAndOpts[par.key] = par.value
 
+            ###
+            invalidProgram = true
+            invalidOption = true
+            invalidOptionValue = ""
             #env.logger.info "par.key: " + JSON.stringify(par.key,null,2) + ", par.value: " + par.value
             if par.key == "program"
-              unless _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)?
-                invalidProgramValue = true
+              if _.find(@availableProgramsAndOptions, (a)=> (a.key).indexOf(par.value)>=0)?
+                invalidProgram = false
             else
               for program in @availableProgramsAndOptions
                 for option in program.options
                   #env.logger.info "option: " + JSON.stringify(option,null,2) + ", par.value: " + par.value
                   if option.unit is "enum"
-                    unless _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)
-                      env.logger.debug "Invalid value #{par.value}"
-                      return null
+                    if _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)
+                      invalidOption = false
+                    else
+                      invalidOptionValue = par.value
                   if option.type is "Int"
                     min = Number option.constraints.min
                     max = Number option.constraints.max
                     stepsize = if option.constraints.stepsize? then option.constraints.stepsize else 1
-                    unless (Number par.value) >= min and (Number par.value) <= max and ((Number par.value) / stepsize) % 1 < 0.0001
-                      env.logger.debug "Invalid option value #{par.value}"
-                      return null
+                    if (Number par.value) >= min and (Number par.value) <= max and ((Number par.value) / stepsize) % 1 < 0.0001
+                      invalidOption = false
+                    else
+                      invalidOptionValue = par.value
+            if invalidProgram
+              env.logger.debug "Invalid value #{par.value}"
+              return null
+            if invalidOption
+              env.logger.debug "Invalid option #{}value #{invalidOptionValue}"
+              return null
+            ###
+          env.logger.info "progAndOpts: " + JSON.stringify(progAndOpts,null,2)
           return progAndOpts
         catch err
           env.logger.debug "Handled error in parseProgramAndOptions " + err
@@ -632,6 +649,7 @@ module.exports = (env) ->
               .then((appliances)=>
                 @plugin.homeconnect.setActiveProgram(@haid, _key, options)
                 .then(()=>
+                  env.logger.debug "setActiveProgram executed"
                   resolve()
                 )
                 .catch((err)=>
