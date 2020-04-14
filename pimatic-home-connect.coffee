@@ -647,15 +647,17 @@ module.exports = (env) ->
             if @haid? and _key? and options?
               @plugin.homeconnect.setSelectedProgram(@haid, _key, options)
               .then((appliances)=>
-                @plugin.homeconnect.setActiveProgram(@haid, _key, options)
-                .then(()=>
-                  env.logger.debug "setActiveProgram executed"
-                  resolve()
-                )
-                .catch((err)=>
-                  env.logger.error "Error setActiveProgram " + err
-                  reject("Error setActiveProgram")
-                )
+                setTimeout(()=>
+                  @plugin.homeconnect.setActiveProgram(@haid, _key, options)
+                  .then(()=>
+                    env.logger.debug "setActiveProgram executed"
+                    resolve()
+                  )
+                  .catch((err)=>
+                    env.logger.error "Error setActiveProgram " + err
+                    reject("Error setActiveProgram")
+                  )
+                ,2000)
               ).catch((err)=>
                 env.logger.debug "Error handled setProgram " + err
                 reject("Error handled setProgram")

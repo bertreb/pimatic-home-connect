@@ -55,3 +55,5 @@
 	* fixed debug handling
 * 20200414, v0.2.13
 	* added debug handling
+* 20200414, v0.2.14
+	* added delay between commands
