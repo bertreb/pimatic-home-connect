@@ -59,3 +59,5 @@
 	* changed to 1-step execution command
 * 20200414, v0.2.16
 	* added options check
+* 20200414, v0.2.17
+	* added debug info

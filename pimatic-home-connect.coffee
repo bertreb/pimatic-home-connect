@@ -324,7 +324,7 @@ module.exports = (env) ->
           .then((programAndOptions)=>
             @availableProgramsAndOptions.push programAndOptions
             if _.size(@availableProgramsAndOptions) is _.size(programs)
-              env.logger.debug "AvailableProgramsAndOptions is ready"
+              env.logger.debug "AvailableProgramsAndOptions is ready: " + JSON.stringify(@availableProgramsAndOptions,null,2)
               #@setAttributesVisibility()
           ).catch((err)=>
             env.logger.debug "Error handled in getting available programAndOptions " + err
@@ -612,6 +612,7 @@ module.exports = (env) ->
               _key = po.key
 
             options = []
+            env.logger.debug "po.options " + JSON.stringify(po.options,null,2)
             for option in po.options
               if _programAndOptions[@getLastValue(option.key)]?
                 _parameter =
@@ -623,7 +624,7 @@ module.exports = (env) ->
                     _parameter["value"] = Boolean _programAndOptions[@getLastValue(option.key)]
                   else
                     _parameter["value"] = option.type + '.' + _programAndOptions[@getLastValue(option.key)]
-                #env.logger.info "_parameter " + JSON.stringify(_parameter,null,2)
+                env.logger.info "_parameter " + JSON.stringify(_parameter,null,2)
                 options.push _parameter
               else
                 lastValue = @attributeValues[@getLastValue(option.key)]
