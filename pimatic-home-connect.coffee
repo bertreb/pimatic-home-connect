@@ -515,10 +515,10 @@ module.exports = (env) ->
                 for option in program.options
                   #env.logger.info "option: " + JSON.stringify(option,null,2) + ", par.value: " + par.value
                   if option.unit is "enum"
-                    unless _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)?
+                    unless _.find(option.constraints.allowedvalues, (o)=> (o).indexOf(par.value)>=0)
                       env.logger.debug "Invalid value #{par.value}"
                       return null
-                  else if option.type is "Int"
+                  if option.type is "Int"
                     min = Number option.constraints.min
                     max = Number option.constraints.max
                     stepsize = if option.constraints.stepsize? then option.constraints.stepsize else 1
