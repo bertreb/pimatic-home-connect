@@ -645,23 +645,23 @@ module.exports = (env) ->
             env.logger.info "@haid: " + @haid + ", _key: " + _key + ", options: " + JSON.stringify(options,null,2)
 
             if @haid? and _key? and options?
-              @plugin.homeconnect.setSelectedProgram(@haid, _key, options)
-              .then((appliances)=>
-                setTimeout(()=>
-                  @plugin.homeconnect.setActiveProgram(@haid, _key, options)
-                  .then(()=>
-                    env.logger.debug "setActiveProgram executed"
-                    resolve()
-                  )
-                  .catch((err)=>
-                    env.logger.error "Error setActiveProgram " + err
-                    reject("Error setActiveProgram")
-                  )
-                ,2000)
-              ).catch((err)=>
-                env.logger.debug "Error handled setProgram " + err
-                reject("Error handled setProgram")
+              #@plugin.homeconnect.setSelectedProgram(@haid, _key, options)
+              #.then((appliances)=>
+              #  setTimeout(()=>
+              @plugin.homeconnect.setActiveProgram(@haid, _key, options)
+              .then(()=>
+                env.logger.debug "setActiveProgram executed"
+                resolve()
               )
+              .catch((err)=>
+                env.logger.error "Error setActiveProgram " + err
+                reject("Error setActiveProgram")
+              )
+              #  ,2000)
+              #).catch((err)=>
+              #  env.logger.debug "Error handled setProgram " + err
+              #  reject("Error handled setProgram")
+              #)
             else
               env.logger.debug "Invalid @haid, _key or options"
               reject("Invalid @haid, _key or options")
